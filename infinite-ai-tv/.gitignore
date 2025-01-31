@@ -1,0 +1,23 @@
+# glitch stuff
+.glitchdotcom.json
+
+# node stuff
+.node-gyp
+node_modules
+
+# other crap
+config.json
+*.lnk
+*.scratch.txt
+public/image.html
+export*.xml
+scores.db
+
+# don't commit API keys and secrets!
+.env
+
+# don't commit generated crap
+raw/
+played/
+episode-*.json
+adventure-*.json

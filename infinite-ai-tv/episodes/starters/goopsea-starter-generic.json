@@ -1,0 +1,30 @@
+{
+   "gamestarted": true,
+   "prompt": "[The following is a conversation between Goopsea, Jack, and Woadie.]",
+   "memory": "[This is a chat log between the following characters: Goopsea, Jack, and Woadie. Goopsea is a humorous overweight cat, Woadie is a blisfully ignorant frog dog, and Jack is their awkward goofball owner.]",
+   "authorsnote": "[style: chat log]",
+   "anotetemplate": "[Author's note: <|>]",
+   "actions": [],
+   "worldinfo": [
+      {
+         "key": "Detroit",
+         "keysecondary": "",
+         "content": "Goopsea and Jack often travel to Detroit on the weekend for fun.",
+         "comment": "",
+         "folder": null,
+         "selective": false,
+         "constant": false
+      },
+      {
+         "key": "pierogi, pierogies, Goopsea's favorite food",
+         "keysecondary": "",
+         "content": "Goopsea's favorite food, often stuff with potato and cheese.",
+         "comment": "",
+         "folder": null,
+         "selective": false,
+         "constant": true
+      }
+   ],
+   "wifolders_d": {},
+   "wifolders_l": []
+}

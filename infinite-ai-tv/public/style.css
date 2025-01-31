@@ -1,0 +1,92 @@
+.modItem {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  padding: 10px;
+}
+
+ul {
+  /* remove list item bullets */
+  list-style-type: none;
+  padding: 0;
+}
+
+ul li.modItem:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.approve {
+  background: green;
+}
+
+.deny {
+  background: red;
+}
+
+body {
+  background: #444;
+  font-family: 'Open Sans', sans-serif;
+}
+
+h1 {
+  text-align: center;
+  color: orange;
+  margin-bottom: 0px;
+}
+
+form {
+  position: relative;
+  border-radius: 4px;
+  width: 400px;
+  height: 180px;
+  margin: 0 auto;
+}
+
+form textarea {
+  border-radius: 2px;
+  box-shadow: 0px 2px 11px 0px rgba(0, 0, 0, 0.3);
+  border: 1px solid #e2e6e6;
+  margin: 10px 0 10px 0;
+  font-family: 'Open Sans', sans-serif;
+  outline: none;
+  width: 395px;
+  height: 100px;
+}
+
+form input {
+  border-radius: 2px;
+  box-shadow: 0px 2px 11px 0px rgba(0, 0, 0, 0.3);
+  border: 1px solid #e2e6e6;
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+  outline: none;
+}
+
+form span.counter {
+  float: right;
+  color: #f2f2f2;
+}
+
+form p.info {
+  font-size: 11px;
+  color: #999;
+}
+
+form label {
+  color: #fff;
+}
+
+form p.info>span {
+  color: #fff;
+}
+
+form input[type=submit] {
+  cursor: pointer;
+  box-shadow: 0px 2px 11px 0px rgba(0, 0, 0, 0.3);
+  border: 1px solid #A8F1FF;
+  border-radius: 2px;
+  background-color: #0093B0;
+  color: #fff;
+  float: right;
+  padding: 10px;
+}
