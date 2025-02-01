@@ -3,7 +3,7 @@ const { hash, streamToBase64String } = require("./utils");
 
 module.exports = class ElevenLabsTTS {
   constructor() {
-    this.modelId = "eleven_multilingual_v1"; // double check the voices available match to the model specified
+    this.modelId = "eleven_multilingual_v2"; // double check the voices available match to the model specified
   }
 
   /**
@@ -18,22 +18,32 @@ module.exports = class ElevenLabsTTS {
    */
   async textToSpeech(message, voiceId = process.env.ELEVENLABS_VOICE_ID, options = {}) {
     // https://uberduck.readme.io/reference/generate_speech_synchronously_speak_synchronous_post
-    const requestUrl = `"https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+    const requestUrl = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`;
     const postData = {
       model_id: this.modelId,
       text: message,
       ...options,
     };
+    console.re.log(`elevenlabs:textToSpeech> ${requestUrl} > ${JSON.stringify(postData)}`);
     return fetch(requestUrl, {
       method: "POST",
       body: JSON.stringify(postData),
       headers: {
-        "Accept": "application/json",
         "Content-Type": "application/json",
-        "xi-api-key": `${process.env.ELEVENLABS_API_SECRET}`,
+        "xi-api-key": process.env.ELEVENLABS_API_SECRET,
       },
     }).then((response) => {
       return streamToBase64String(response.body);
+    }).catch((ex) => {
+      console.re.error(
+        `elevenlabs:textToSpeech> error ${ex.name}: ${ex.message}`
+      );
+      if (ex.response) {
+        console.re.error(ex.response.data);
+      } else {
+        console.re.error(ex.stack);
+      }
+      return "";
     });
   }
 
