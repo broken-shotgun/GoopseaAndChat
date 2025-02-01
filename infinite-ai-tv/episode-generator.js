@@ -1,15 +1,21 @@
 const fs = require("fs");
 const { chunkify, getRandomInt, shuffle } = require("./utils");
 // const { censor } = require("./censor");
-const GCTTS = require("./google-tts-client");
-const KoboldAIClient = require("./kobold-client");
-const OpenAIClient = require("./openai-client");
+// const GCTTS = require("./google-tts-client");
+// const WinTTS = require("./windows-free-tts");
+const ElevenLabsTTS = require("./elevenlabs-tts-client");
+//const KoboldAIClient = require("./kobold-client");
+//const OpenAIClient = require("./openai-client");
+const GooseAIClient = require("./goose-client");
 
 module.exports = class EpisodeGenerator {
   constructor() {
-    this.tts = new GCTTS();
-    this.koboldai = new KoboldAIClient();
-    this.openai = new OpenAIClient();
+    // this.tts = new GCTTS();
+    // this.tts = new WinTTS();
+    this.tts = new ElevenLabsTTS();
+    // this.koboldai = new KoboldAIClient();
+    // this.openai = new OpenAIClient();
+    this.gooseai = new GooseAIClient();
     this.running = false;
     this.continue = false;
     this.continueCount = 0;
@@ -20,7 +26,21 @@ module.exports = class EpisodeGenerator {
     this.chatLogDivider = ">>";
     this.lineRegex = new RegExp(`^([^\n\r${this.chatLogDivider}]*)${this.chatLogDivider} (.+)$`, "i");
     this.prevModifierIndex = -1
-    this.setupPrompt = `You are generating a script between the following characters: Goopsea, Jack, and Woadie. Goopsea is a humorous overweight cat, Woadie is a blissfully ignorant frog dog, and Jack is their awkward goofball owner.  Every line should be formatted like this: Name ${this.chatLogDivider} dialoge.  If the line is anything other than dialog, please start with ${this.chatLogDivider}. Here is an example: Goopsea ${this.chatLogDivider} Hi.\n${this.chatLogDivider} A loud rumble occurs and then Jack falls out of the ceiling.\nJack ${this.chatLogDivider} Hello.`;
+    this.setupPrompt = `
+      You are generating a television screenplay between the following characters: Goopsea, Jack, and Woadie. 
+      Goopsea is a humorous overweight cat, Woadie is a blissfully ignorant frog dog, and Jack is their awkward goofball owner.  
+      
+      Every line should be formatted like this:
+      CHARACTER ${this.chatLogDivider} LINE OF DIALOG
+      
+      Every line should end with a newline character: \n
+      Every line should be dialog between the characters specified above.
+      
+      Here is an example: 
+      Goopsea ${this.chatLogDivider} Hi it's me, I like to eat lasagna!
+      Jack ${this.chatLogDivider} Ouch, my back!
+      Woadie ${this.chatLogDivider} Who's back?
+      `;
     // https://en.wikipedia.org/wiki/The_Thirty-Six_Dramatic_Situations
     this.modifiers = shuffle([
       "Continue the script and focus on the initial topic.",
@@ -107,7 +127,7 @@ module.exports = class EpisodeGenerator {
   start() {
     this.running = true;
     
-    this.runOpenAIGeneratorV2();
+    this.runGeneratorV3();
     this.runProcessor();
 
     // Goops & Gobs
@@ -120,16 +140,12 @@ module.exports = class EpisodeGenerator {
   }
 
   /**
-   * Run more interactive AI generation loop using OpenAI to generate responses.
-   * 
-   * Keep an eye on usage as each request costs $$$:
-   * https://platform.openai.com/account/usage
-   * 
+   * Run more interactive AI generation loop using GooseAI to generate responses.
    */
-  async runOpenAIGeneratorV2() {
+  async runGeneratorV3() {
     if (!this.running) return;
     if (this.userPromptQueue.length < 1) {
-      setTimeout(this.runOpenAIGeneratorV2.bind(this), 100);
+      setTimeout(this.runGeneratorV3.bind(this), 100);
       return;
     }
 
@@ -140,15 +156,20 @@ module.exports = class EpisodeGenerator {
       if (this.continue) { // continue previous episode
         this.continueCount++;
         messages.push(...this.currentMessages); // add all messages from previous episode(s)
-        messages.push({role: "user", content: currentUserPrompt.prompt});
+        // messages.push({role: "user", content: currentUserPrompt.prompt}); // openai
+
+        messages.push(currentUserPrompt.prompt);
         console.re.log(`continuing previous episode, current episode arc = ${this.continueCount + 1} episodes`);
       }
       else { // new episode
         console.re.log(`starting new episode`);
         this.continueCount = 0;
         this.currentMessages = [];
-        messages.push({role: "system", content: this.setupPrompt});
-        messages.push({role: "user", content: currentUserPrompt.prompt});
+        // messages.push({role: "system", content: this.setupPrompt}); // openai
+        // messages.push({role: "user", content: currentUserPrompt.prompt}); // openai
+
+        messages.push(this.setupPrompt);
+        messages.push(currentUserPrompt.prompt);
       }
 
       // var img_b64 = null;
@@ -161,7 +182,7 @@ module.exports = class EpisodeGenerator {
       //   console.re.error(err);
       // }
 
-      var generateCount = 2;
+      var generateCount = 1;
       var modifierIndex = getRandomInt(this.modifiers.length);
       while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
       this.prevModifierIndex = modifierIndex;
@@ -169,57 +190,76 @@ module.exports = class EpisodeGenerator {
       for(var i=0; i<generateCount; ++i) {
         if (i==1) {
           var midPrompt = this.modifiers[modifierIndex];
-          console.re.log(`openai:modify> ${midPrompt.toUpperCase()}`);
-          messages.push({role: "user", content: `[${midPrompt}]` });
+          console.re.log(`generator:modify> ${midPrompt.toUpperCase()}`);
+          // messages.push({role: "user", content: `[${midPrompt}]` });
+          messages.push(`[${midPrompt}]`);
         }
 
-        const maxTokens = this.getMaxTokens(i, generateCount) + prevRemainingTokens;
-        var response;
+        // const maxTokens = this.getMaxTokens(i, generateCount) + prevRemainingTokens;
+        const maxTokens = 500; // 150
+        let response;
         try {
-          console.re.log(`openai:tokens> [${i}] generating with max tokens = ${maxTokens}`);
-          response = await this.openai.generateChat(messages, {max_tokens: maxTokens});
+          console.re.log(`generator:tokens> [${i}] generating with max tokens = ${maxTokens}`);
+          // response = await this.openai.generateChat(messages, {max_tokens: maxTokens});
+          response = await this.gooseai.generate(messages, { min_tokens: maxTokens / 2, max_tokens: maxTokens });
         } catch(generateErr) {
           console.re.error(generateErr);
           continue;
         }
         if (!response) {
-          console.re.warn(`openai:generateChat> null generate response, skipping...`);
+          console.re.warn(`generator:generate> null generate response, skipping...`);
           continue;
         }
 
-        console.re.log(`${response.status} ${response.statusText}: ${JSON.stringify(response.data)}`);
+        console.re.log(`generator:generate> ${response.status} ${response.statusText}: ${JSON.stringify(response.data)}`);
   
-        if (response.status === 200 && 
-          response.data && 
-          response.data.choices.length > 0
-        ){
-          console.re.log(`openai:generateChat> ${response.data.choices[0].message.content}`);
-          messages.push(response.data.choices[0].message);
-          prevRemainingTokens = maxTokens - response.data.usage.completion_tokens;
-          if (prevRemainingTokens < 0) prevRemainingTokens = 0;
-          console.re.log(`openai:generateChat> LEFTOVER TOKENS = ${prevRemainingTokens}`);
+        // if (response.status === 200 && 
+        //   response.data && 
+        //   response.data.choices.length > 0
+        // ){
+        if (response) {
+          // console.re.log(`generator:generate> ${response.data.choices[0].message.content}`);
+          // messages.push(response.data.choices[0].message);
+          // prevRemainingTokens = maxTokens - response.data.usage.completion_tokens;
+          // if (prevRemainingTokens < 0) prevRemainingTokens = 0;
+          messages.push(response);
+          prevRemainingTokens = 0;
+          console.re.log(`generator:generate> LEFTOVER TOKENS = ${prevRemainingTokens}`);
         } else {
-          console.re.warn(`openai:generateChat> no responses data and/or choices`);
+          console.re.warn(`generator:generate> no responses data and/or choices`);
         }
       }
   
       var rawTxtStory;
       var episodeName;
+      const service = "gooseai"; // "openai";
       if (this.continue) { // only process latest episode in the continue saga
-        episodeName = `episode-${currentUserPrompt.date.replaceAll(":", "-")}-${this.episodeNumber.toString().padStart(3, '0')}-part-${this.continueCount + 1}-openai-${currentUserPrompt.user}`;
-        rawTxtStory = currentUserPrompt.prompt + "\n" + messages.splice(this.currentMessages.length)
-          .filter((msg) => msg.role === "assistant")
-          .map((msg) => msg.content)
-          .join("\n");
+        episodeName = `episode-${currentUserPrompt.date.replaceAll(":", "-")}-${this.episodeNumber.toString().padStart(3, '0')}-part-${this.continueCount + 1}-${service}-${currentUserPrompt.user}`;
+
+        // openai chat response
+        // rawTxtStory = currentUserPrompt.prompt + "\n" + messages.splice(this.currentMessages.length)
+        //   .filter((msg) => msg.role === "assistant")
+        //   .map((msg) => msg.content)
+        //   .join("\n");
+
+        rawTxtStory = currentUserPrompt.prompt + "\n" + messages.splice(this.currentMessages.length).join("\n");
       } else {
-        episodeName = `episode-${currentUserPrompt.date.replaceAll(":", "-")}-${this.episodeNumber.toString().padStart(3, '0')}-openai-${currentUserPrompt.user}`;
-        rawTxtStory = currentUserPrompt.prompt + "\n" + messages
-          .filter((msg) => msg.role === "assistant")
-          .map((msg) => msg.content)
-          .join("\n");
+        episodeName = `episode-${currentUserPrompt.date.replaceAll(":", "-")}-${this.episodeNumber.toString().padStart(3, '0')}-${service}-${currentUserPrompt.user}`;
+
+        // openai chat response
+        // rawTxtStory = currentUserPrompt.prompt + "\n" + messages
+        //   .filter((msg) => msg.role === "assistant")
+        //   .map((msg) => msg.content)
+        //   .join("\n");
+
+        console.re.log(`generator:messages>`, messages);
+        
+        rawTxtStory = currentUserPrompt.prompt + "\n" + messages.splice(this.currentMessages.length).join("\n");
       }
-      const aiModel = this.openai.getCurrentModel();
-      await this.moderateEpisode({
+      // const aiModel = this.openai.getCurrentModel();
+      const aiModel = this.gooseai.getCurrentModel();
+
+      const rawEpisode = {
         name: episodeName,
         date: currentUserPrompt.date,
         user: currentUserPrompt.user,
@@ -227,18 +267,20 @@ module.exports = class EpisodeGenerator {
         location: currentLocation,
         story: rawTxtStory,
         //ai_img_background: img_b64
-      });
+      };
+      // await this.moderateEpisode(rawEpisode); skip auto-moderation
+      this.rawEpisodeQueue.push(rawEpisode); // comment this out if moderation enabled
       
 
       this.episodeNumber += 1;
       this.continue = false;
       this.currentMessages = messages; // messages.splice(this.currentMessages.length); // if the cost is outrageous, only store last episode into memory
     } catch (err) {
-      console.re.warn(`runOpenAIGenerator> Error generating prompt for ${currentUserPrompt.user}`);
+      console.re.warn(`runGeneratorV3> Error generating prompt for ${currentUserPrompt.user}`);
       console.re.error(err);
     }
 
-    setTimeout(this.runOpenAIGeneratorV2.bind(this), 100);
+    setTimeout(this.runGeneratorV3.bind(this), 100);
   }
 
   /**
@@ -299,14 +341,17 @@ module.exports = class EpisodeGenerator {
             .map((msg) => msg.content)
             .join("\n");
         const aiModel = this.openai.getCurrentModel();
-        await this.moderateEpisode({
+        
+        const rawEpisode = {
           name: episodeName,
           date: currentUserPrompt.date,
           user: currentUserPrompt.user,
           model: aiModel,
           location: currentLocation,
           story: rawTxtStory
-        });
+        };
+        // await this.moderateEpisode(rawEpisode); skip auto-moderation
+        this.rawEpisodeQueue.push(rawEpisode); // comment this out if moderation enabled
   
         this.continueCount++;
       } catch (err) {
@@ -580,13 +625,24 @@ module.exports = class EpisodeGenerator {
       //*
       var base64Audio;
       try {
-        const voiceType = "Standard"; //"Neural2";
+        // Google TTS
+        // const voiceType = "Standard"; //"Neural2";
+        // base64Audio =
+        //   actor === "jack" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-D`, { pitch: 4.8, })
+        //     : actor === "goopsea" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-J`, { pitch: -1.8, })
+        //     : actor === "woadie" ? await this.tts.textToSpeech(chunk, `de-DE-${voiceType}-D`, { pitch: -4.8, speakingRate: 1.4 })
+        //     : actor === "narrator" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-I`, { pitch: -3.6, speakingRate: 1.11 })
+        //     : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor), this.tts.getRandomPitch());
+
+        // TODO update for WinTTS
+        
+        // TODO update for ElevenLabsTTS
         base64Audio =
-          actor === "jack" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-D`, { pitch: 4.8, })
-            : actor === "goopsea" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-J`, { pitch: -1.8, })
-            : actor === "woadie" ? await this.tts.textToSpeech(chunk, `de-DE-${voiceType}-D`, { pitch: -4.8, speakingRate: 1.4 })
-            : actor === "narrator" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-I`, { pitch: -3.6, speakingRate: 1.11 })
-            : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor), this.tts.getRandomPitch());
+            actor === "goopsea" ? await this.tts.textToSpeech(chunk) // default narrator voice for Goops
+            // : actor === "jack" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-D`)
+            // : actor === "woadie" ? await this.tts.textToSpeech(chunk, `de-DE-${voiceType}-D`)
+            // : actor === "narrator" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-I`)
+            : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor).voice_id); // random voice for everyone else
       } catch (error) {
         console.re.warn(`TTS error - problem generating audio ${error.name}`);
       }
