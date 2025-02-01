@@ -13,6 +13,7 @@
     "cors": "^2.8.5",
     "discord.js": "^14.7.0",
     "dotenv": "^16.0.3",
+    "elevenlabs": "^1.50.4",
     "express": "^4.18.2",
     "libsodium-wrappers": "^0.7.10",
     "node-fetch": "^2.6.7",
@@ -22,7 +23,7 @@
     "tmi.js": "^1.8.5"
   },
   "engines": {
-    "node": "16.14.2"
+    "node": "22.13.1"
   },
   "license": "MIT",
   "keywords": [

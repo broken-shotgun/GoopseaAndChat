@@ -1,9 +1,13 @@
 const fetch = require("node-fetch");
 const { hash, streamToBase64String } = require("./utils");
+const { ElevenLabsClient } = require("elevenlabs");
 
 module.exports = class ElevenLabsTTS {
   constructor() {
-    this.modelId = "eleven_multilingual_v2"; // double check the voices available match to the model specified
+    this.modelId = "eleven_turbo_v2_5"; // double check the voices available match to the model specified: eleven_turbo_v2_5, eleven_multilingual_v2
+    this.elevenlabs = new ElevenLabsClient({
+      apiKey: process.env.ELEVENLABS_API_SECRET,
+    });
   }
 
   /**
@@ -16,38 +20,67 @@ module.exports = class ElevenLabsTTS {
    * @param {object} options https://elevenlabs.io/docs/api-reference/text-to-speech/convert
    * @returns promoise that returns base64 encoded audiocontent or null
    */
-  async textToSpeech(message, voiceId = process.env.ELEVENLABS_VOICE_ID, options = {}) {
-    // https://uberduck.readme.io/reference/generate_speech_synchronously_speak_synchronous_post
-    const requestUrl = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`;
-    const postData = {
+  // async textToSpeech(message, voiceId = process.env.ELEVENLABS_VOICE_ID, options = {}) {
+  //   // https://uberduck.readme.io/reference/generate_speech_synchronously_speak_synchronous_post
+  //   const requestUrl = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_22050_32`; // pcm_22050, mp3_22050_32, mp3_44100_32
+  //   const postData = {
+  //     model_id: this.modelId,
+  //     text: message,
+  //     ...options,
+  //   };
+  //   console.re.log(`elevenlabs:textToSpeech> ${requestUrl} > ${JSON.stringify(postData)}`);
+  //   return fetch(requestUrl, {
+  //     method: "POST",
+  //     body: JSON.stringify(postData),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       "xi-api-key": process.env.ELEVENLABS_API_SECRET,
+  //     },
+  //   }).then((response) => {
+  //     console.re.log("elevenlabs:textToSpeech> response = ", response.status, JSON.stringify(response.body));
+  //     return streamToBase64String(response.body);
+  //   }).catch((ex) => {
+  //     console.re.error(
+  //       `elevenlabs:textToSpeech> error ${ex.name}: ${ex.message}`
+  //     );
+  //     if (ex.response) {
+  //       console.re.error(ex.response.data);
+  //     } else {
+  //       console.re.error(ex.stack);
+  //     }
+  //     return "";
+  //   });
+  // }
+
+  async textToSpeech(message, voice = "Brian", options = {}) {
+    const request = {
       model_id: this.modelId,
       text: message,
+      voice,
+      // stream: true,
       ...options,
     };
-    console.re.log(`elevenlabs:textToSpeech> ${requestUrl} > ${JSON.stringify(postData)}`);
-    return fetch(requestUrl, {
-      method: "POST",
-      body: JSON.stringify(postData),
-      headers: {
-        "Content-Type": "application/json",
-        "xi-api-key": process.env.ELEVENLABS_API_SECRET,
-      },
-    }).then((response) => {
-      return streamToBase64String(response.body);
-    }).catch((ex) => {
-      console.re.error(
-        `elevenlabs:textToSpeech> error ${ex.name}: ${ex.message}`
-      );
-      if (ex.response) {
-        console.re.error(ex.response.data);
-      } else {
-        console.re.error(ex.stack);
-      }
-      return "";
-    });
+    console.re.log(`elevenlabs:textToSpeech> ${JSON.stringify(request)}`);
+
+    return this.elevenlabs.generate(request)
+      .then((audioStream) => { 
+        console.re.log("elevenlabs:textToSpeech> success! stream =", JSON.stringify(audioStream));
+        return streamToBase64String(audioStream); 
+      })
+      .catch((ex) => {
+        console.re.error(
+          `elevenlabs:textToSpeech> error ${ex.name}: ${ex.message}`
+        );
+        if (ex.response) {
+          console.re.error(ex.response.data);
+        } else {
+          console.re.error(ex.stack);
+        }
+        return "";
+      });
   }
 
-  voices =  [
+  voices = [
     {
       "voice_id": "9BWtsMINqrJLrRacOk9x",
       "name": "Aria",
