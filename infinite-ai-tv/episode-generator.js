@@ -1,18 +1,18 @@
 const fs = require("fs");
 const { chunkify, getRandomInt, shuffle } = require("./utils");
 // const { censor } = require("./censor");
-const GCTTS = require("./google-tts-client");
+// const GCTTS = require("./google-tts-client");
 // const WinTTS = require("./windows-free-tts");
-// const ElevenLabsTTS = require("./elevenlabs-tts-client");
+const ElevenLabsTTS = require("./elevenlabs-tts-client");
 //const KoboldAIClient = require("./kobold-client");
 //const OpenAIClient = require("./openai-client");
 const GooseAIClient = require("./goose-client");
 
 module.exports = class EpisodeGenerator {
   constructor() {
-    this.tts = new GCTTS();
+    // this.tts = new GCTTS();
     // this.tts = new WinTTS();
-    // this.tts = new ElevenLabsTTS();
+    this.tts = new ElevenLabsTTS();
     // this.koboldai = new KoboldAIClient();
     // this.openai = new OpenAIClient();
     this.gooseai = new GooseAIClient();
@@ -626,23 +626,23 @@ module.exports = class EpisodeGenerator {
       var base64Audio;
       try {
         // Google TTS
-        const voiceType = "Standard"; //"Neural2";
-        base64Audio =
-          actor === "jack" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-D`, { pitch: 4.8, })
-            : actor === "goopsea" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-J`, { pitch: -1.8, })
-            : actor === "woadie" ? await this.tts.textToSpeech(chunk, `de-DE-${voiceType}-D`, { pitch: -4.8, speakingRate: 1.4 })
-            : actor === "narrator" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-I`, { pitch: -3.6, speakingRate: 1.11 })
-            : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor), this.tts.getRandomPitch());
+        // const voiceType = "Standard"; //"Neural2";
+        // base64Audio =
+        //   actor === "jack" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-D`, { pitch: 4.8, })
+        //     : actor === "goopsea" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-J`, { pitch: -1.8, })
+        //     : actor === "woadie" ? await this.tts.textToSpeech(chunk, `de-DE-${voiceType}-D`, { pitch: -4.8, speakingRate: 1.4 })
+        //     : actor === "narrator" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-I`, { pitch: -3.6, speakingRate: 1.11 })
+        //     : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor), this.tts.getRandomPitch());
 
         // TODO update for WinTTS
         
-        // TODO update for ElevenLabsTTS
-        // base64Audio =
-        //     actor === "goopsea" ? await this.tts.textToSpeech(chunk) // default narrator voice for Goops
-        //     // : actor === "jack" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-D`)
-        //     // : actor === "woadie" ? await this.tts.textToSpeech(chunk, `de-DE-${voiceType}-D`)
-        //     // : actor === "narrator" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-I`)
-        //     : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor).name); // random voice for everyone else
+        // ElevenLabsTTS
+        base64Audio =
+            actor === "goopsea" ? await this.tts.textToSpeech(chunk) // default narrator voice for Goops
+            // : actor === "jack" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-D`)
+            // : actor === "woadie" ? await this.tts.textToSpeech(chunk, `de-DE-${voiceType}-D`)
+            // : actor === "narrator" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-I`)
+            : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor).voice_id); // random voice for everyone else
       } catch (error) {
         console.re.warn(`TTS error - problem generating audio ${error.name}`);
       }
