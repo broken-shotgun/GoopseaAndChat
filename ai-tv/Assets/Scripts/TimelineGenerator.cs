@@ -477,7 +477,7 @@ public class TimelineGenerator : MonoBehaviour
                     {
                         var audioTimelineClip = mainAudioTrack.CreateClip(dialogAudioClip);
                         audioTimelineClip.start = startTime;
-                        audioTimelineClip.duration = dialogAudioClip.length / 2;
+                        audioTimelineClip.duration = dialogAudioClip.length; // for wav I had to divide by 2 for some reason?
                         duration = audioTimelineClip.duration;
 
                         if (direction.target == "goopsea")
