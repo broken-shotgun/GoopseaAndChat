@@ -10,6 +10,7 @@ using TMPro;
 using UnityEngine.Networking;
 using IngameDebugConsole;
 using System.Text;
+using System.Threading.Tasks;
 
 public class TimelineGenerator : MonoBehaviour
 {
@@ -281,15 +282,17 @@ public class TimelineGenerator : MonoBehaviour
             if (episodeQueue.HasEpisodes())
             {
                 var currentEpisodeFile = episodeQueue.Dequeue();
-                bool played = PlayEpisode(currentEpisodeFile);
-                if (played)
+                // https://discussions.unity.com/t/async-await-inside-a-coroutine/804631
+                Task<bool> task = PlayEpisode(currentEpisodeFile);
+                yield return new WaitUntil(() => task.IsCompleted);
+                if (task.Result) // if played
                 {
                     yield return new WaitUntil(() => isEpisodeFinished);
                 }
                 else
                 {
                     yield return new WaitForSeconds(1f);
-                }       
+                }
             }
             else
             {
@@ -350,7 +353,7 @@ public class TimelineGenerator : MonoBehaviour
         }
     }
 
-    bool PlayEpisode(FileInfo file)
+    async Task<bool> PlayEpisode(FileInfo file)
     {
         if (file == null || !File.Exists(file.FullName))
         {
@@ -381,7 +384,7 @@ public class TimelineGenerator : MonoBehaviour
             //Debug.Log(string.Format("Success!  Playing {0}", file.FullName));
             Episode nextEpisode = Deserialize(episodeJson);
             currentUser = nextEpisode.user;
-            TimelineAsset episodeTimeline = CreateTimeline(nextEpisode);
+            TimelineAsset episodeTimeline = await CreateTimeline(nextEpisode);
             director.playableAsset = episodeTimeline;
             director.Play();
             pauseText.enabled = false;
@@ -399,7 +402,7 @@ public class TimelineGenerator : MonoBehaviour
         return JsonUtility.FromJson<Episode>(json);
     }
 
-    public TimelineAsset CreateTimeline(Episode episode)
+    public async Task<TimelineAsset> CreateTimeline(Episode episode)
     {
         if (useAiImageGen) LoadAiImage(episode.ai_img_background);
 
@@ -468,7 +471,8 @@ public class TimelineGenerator : MonoBehaviour
                 var duration = 1.0;
                 if (!string.IsNullOrEmpty(direction.audio))
                 {
-                    var dialogAudioClip = GetAudioClip(direction);
+                    //var dialogAudioClip = GetAudioClipFromBase64Wav(direction);
+                    var dialogAudioClip = await GetAudioClipFromBase64Mp3(direction);
                     if (dialogAudioClip != null) 
                     {
                         var audioTimelineClip = mainAudioTrack.CreateClip(dialogAudioClip);
@@ -603,7 +607,75 @@ public class TimelineGenerator : MonoBehaviour
         subtitleTimelineClip.duration = duration;
     }
 
-    private AudioClip GetAudioClip(StageDirection direction)
+    //private float[] NormalizeMp3(float[] data)
+    //{
+    //    float max = float.MinValue;
+    //    for (int i = 0; i < data.Length; i++)
+    //    {
+    //        if (Math.Abs(data[i]) > max) max = Math.Abs(data[i]);
+    //    }
+    //    for (int i = 0; i < data.Length; i++) data[i] = data[i] / max;
+    //    return data;
+    //}
+
+    //private float[] NormalizeMp3(float[] data)
+    //{
+    //    float max = float.MinValue;
+    //    for (int i = 0; i < data.Length; i++)
+    //    {
+    //        if (System.Math.Abs(data[i]) > max) max = System.Math.Abs(data[i]);
+    //    }
+    //    for (int i = 0; i < data.Length; i++) data[i] = data[i] / max;
+    //    return data;
+    //}
+
+    ///*
+    // * https://discussions.unity.com/t/how-to-convert-base64-mpeg-to-audioclip/908900/2
+    // */
+    //private float[] ConvertByteToFloatMp3(byte[] array)
+    //{
+    //    float[] floatArr = new float[array.Length / 4];
+    //    for (int i = 0; i < floatArr.Length; i++)
+    //    {
+    //        if (BitConverter.IsLittleEndian) Array.Reverse(array, i * 4, 4);
+    //        floatArr[i] = BitConverter.ToSingle(array, i * 4);
+    //    }
+    //    return NormalizeMp3(floatArr);
+    //}
+
+    //private AudioClip GetAudioClipFromBase64Mp3(StageDirection direction)
+    //{
+    //    // https://stackoverflow.com/questions/35228767/noisy-audio-clip-after-decoding-from-base64
+    //    byte[] audioBytes = Convert.FromBase64String(direction.audio);
+    //    float[] f = ConvertByteToFloatMp3(audioBytes);
+    //    AudioClip audioClip = AudioClip.Create(direction.target + "dialog", f.Length, 2, 48000, false);
+    //    audioClip.SetData(f, 0);
+    //    return audioClip;
+    //}
+
+    /**
+     * https://gist.github.com/readpan/a7b43c40342f315a32146cbad0d36cfe
+     */
+    static async Task<AudioClip> GetAudioClipFromBase64Mp3(StageDirection direction)
+    {
+        var fileBytes = Convert.FromBase64String(direction.audio);
+        var fullPath = Application.persistentDataPath + "/temp.mp3";
+        await File.WriteAllBytesAsync(fullPath, fileBytes);
+        fullPath = "file://" + fullPath;
+        using (var uwr = UnityWebRequestMultimedia.GetAudioClip(fullPath, AudioType.MPEG))
+        {
+            uwr.downloadHandler = new DownloadHandlerAudioClip(fullPath, AudioType.MPEG);
+            ((DownloadHandlerAudioClip)uwr.downloadHandler).streamAudio = true;
+
+            await uwr.SendWebRequest();
+            while (!uwr.isDone)
+                await Task.Delay(1); //can replace with UniTask.WaitUntil(() => uwr.isDone);
+            //File.Delete(fullPath);
+            return (uwr.downloadHandler as DownloadHandlerAudioClip)?.audioClip;
+        }
+    }
+
+    private AudioClip GetAudioClipFromBase64Wav(StageDirection direction)
     {
         // https://stackoverflow.com/questions/35228767/noisy-audio-clip-after-decoding-from-base64
         byte[] audioBytes = Convert.FromBase64String(direction.audio);
@@ -618,6 +690,44 @@ public class TimelineGenerator : MonoBehaviour
         audioClip.SetData(f, 0);
         return audioClip;
     }
+
+    private static float[] ConvertByteToFloat(byte[] array)
+    {
+        float[] result = new float[array.Length / 2];
+        for (int i = 0; i < result.Length; i++)
+        {
+            result[i] = BitConverter.ToInt16(array, i * 2) / 32768.0f;
+        }
+        return result;
+    }
+
+#pragma warning disable IDE0051 // Remove unused private members
+    private void PrintWavHeader(byte[] header)
+    {
+        /*
+        Name	        offset	Size	Value
+        ChunkID	        0	    4	    �RIFF�
+        ChunkSize	    4	    4	    405040
+        Format	        8	    4	    �WAVE�
+        Subchunk1 ID	12	    4	    �fmt�
+        Subchunk1 Size	16	    4	    16
+        Audio Format	20	    2	    1
+        Num Channels	22	    2	    2
+        Sample Rate	    24	    4	    22050
+        Byte Rate	    28	    4	    88200
+        Block Align	    32	    2	    4
+        Bits per Sample	34	    2	    16
+        Subchunk2 ID	36	    4	    �data�
+        Subchunk 2 Size	40	    4	    405004
+        */
+
+    string chunkId = System.Text.Encoding.UTF8.GetString(header[..4]);
+        string format = System.Text.Encoding.UTF8.GetString(header[8..12]);
+        int sampleRate = BitConverter.ToInt32(header[24..28], 0);
+        int numChannels = BitConverter.ToInt16(header[22..24], 0);
+        Debug.Log(string.Format("ChunkID = {0}, Format = {1}, Channels = {2}, Sample Rate = {3}", chunkId, format, numChannels, sampleRate));
+    }
+#pragma warning restore IDE0051 // Remove unused private members
 
     private TimelineClip ChangeCamera(CinemachineTrack cameraTrack, string target)
     {
@@ -772,44 +882,6 @@ public class TimelineGenerator : MonoBehaviour
             cam.GetComponent<CinemachineConfiner2D>().m_BoundingShape2D = bounds;
         }
     }
-
-    private static float[] ConvertByteToFloat(byte[] array)
-    {
-        float[] result = new float[array.Length / 2];
-        for (int i = 0; i < result.Length; i++)
-        {
-            result[i] = BitConverter.ToInt16(array, i * 2) / 32768.0f;
-        }
-        return result;
-    }
-
-#pragma warning disable IDE0051 // Remove unused private members
-    private void PrintWavHeader(byte[] header)
-    {
-        /*
-        Name	        offset	Size	Value
-        ChunkID	        0	    4	    �RIFF�
-        ChunkSize	    4	    4	    405040
-        Format	        8	    4	    �WAVE�
-        Subchunk1 ID	12	    4	    �fmt�
-        Subchunk1 Size	16	    4	    16
-        Audio Format	20	    2	    1
-        Num Channels	22	    2	    2
-        Sample Rate	    24	    4	    22050
-        Byte Rate	    28	    4	    88200
-        Block Align	    32	    2	    4
-        Bits per Sample	34	    2	    16
-        Subchunk2 ID	36	    4	    �data�
-        Subchunk 2 Size	40	    4	    405004
-        */
-
-        string chunkId = System.Text.Encoding.UTF8.GetString(header[..4]);
-        string format = System.Text.Encoding.UTF8.GetString(header[8..12]);
-        int sampleRate = BitConverter.ToInt32(header[24..28], 0);
-        int numChannels = BitConverter.ToInt16(header[22..24], 0);
-        Debug.Log(string.Format("ChunkID = {0}, Format = {1}, Channels = {2}, Sample Rate = {3}", chunkId, format, numChannels, sampleRate));
-    }
-#pragma warning restore IDE0051 // Remove unused private members
 
     [Serializable]
     public class Episode
