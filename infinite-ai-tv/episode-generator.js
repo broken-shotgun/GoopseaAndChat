@@ -5,8 +5,8 @@ const { chunkify, getRandomInt, shuffle } = require("./utils");
 // const WinTTS = require("./windows-free-tts");
 const ElevenLabsTTS = require("./elevenlabs-tts-client");
 //const KoboldAIClient = require("./kobold-client");
-//const OpenAIClient = require("./openai-client");
-const GooseAIClient = require("./goose-client");
+const { OpenAIClient } = require("./openai-client");
+// const GooseAIClient = require("./goose-client");
 
 module.exports = class EpisodeGenerator {
   constructor() {
@@ -14,8 +14,8 @@ module.exports = class EpisodeGenerator {
     // this.tts = new WinTTS();
     this.tts = new ElevenLabsTTS();
     // this.koboldai = new KoboldAIClient();
-    // this.openai = new OpenAIClient();
-    this.gooseai = new GooseAIClient();
+    this.openai = new OpenAIClient();
+    // this.gooseai = new GooseAIClient();
     this.running = false;
     this.continue = false;
     this.continueCount = 0;
@@ -33,7 +33,7 @@ module.exports = class EpisodeGenerator {
       Every line should be formatted like this:
       CHARACTER ${this.chatLogDivider} LINE OF DIALOG
       
-      Every line should end with a newline character: \n
+      Every line should end with a newline.
       Every line should be dialog between the characters specified above.
       
       Here is an example: 
@@ -129,10 +129,6 @@ module.exports = class EpisodeGenerator {
     
     this.runGeneratorV3();
     this.runProcessor();
-
-    // Goops & Gobs
-    // this.runGoopsAndGoblinsOpenAIGenerator();
-    // this.runGoopsAndGoblinsProcessor();
   }
 
   stop() {
@@ -156,33 +152,30 @@ module.exports = class EpisodeGenerator {
       if (this.continue) { // continue previous episode
         this.continueCount++;
         messages.push(...this.currentMessages); // add all messages from previous episode(s)
-        // messages.push({role: "user", content: currentUserPrompt.prompt}); // openai
 
-        messages.push(currentUserPrompt.prompt);
+        // openai
+        messages.push({role: "user", content: currentUserPrompt.prompt});
+
+        // gooseai
+        // messages.push(currentUserPrompt.prompt);
+
         console.re.log(`continuing previous episode, current episode arc = ${this.continueCount + 1} episodes`);
       }
       else { // new episode
         console.re.log(`starting new episode`);
         this.continueCount = 0;
         this.currentMessages = [];
-        // messages.push({role: "system", content: this.setupPrompt}); // openai
-        // messages.push({role: "user", content: currentUserPrompt.prompt}); // openai
 
-        messages.push(this.setupPrompt);
-        messages.push(currentUserPrompt.prompt);
+        // openai
+        messages.push({role: "system", content: this.setupPrompt});
+        messages.push({role: "user", content: currentUserPrompt.prompt});
+
+        // gooseai
+        // messages.push(this.setupPrompt);
+        // messages.push(currentUserPrompt.prompt);
       }
 
-      // var img_b64 = null;
-      // try {
-      //   const imgResponse = await this.openai.generateImage(currentUserPrompt.prompt);
-      //   console.re.log(`generateImage> ${imgResponse.status} ${imgResponse.statusText}`);
-      //   img_b64 = (imgResponse.data) ? imgResponse.data.data[0].b64_json : null;
-      // } catch (err) {
-      //   console.re.warn(`generateImage> Error generating image for ${currentUserPrompt.user}`);
-      //   console.re.error(err);
-      // }
-
-      var generateCount = 1;
+      var generateCount = 2;
       var modifierIndex = getRandomInt(this.modifiers.length);
       while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
       this.prevModifierIndex = modifierIndex;
@@ -191,17 +184,29 @@ module.exports = class EpisodeGenerator {
         if (i==1) {
           var midPrompt = this.modifiers[modifierIndex];
           console.re.log(`generator:modify> ${midPrompt.toUpperCase()}`);
-          // messages.push({role: "user", content: `[${midPrompt}]` });
-          messages.push(`[${midPrompt}]`);
+
+          // openai
+          messages.push({role: "user", content: `[${midPrompt}]` });
+
+          // gooseai
+          // messages.push(`[${midPrompt}]`);
         }
 
-        // const maxTokens = this.getMaxTokens(i, generateCount) + prevRemainingTokens;
-        const maxTokens = 500; // 150
+        // openai
+        const maxTokens = this.getMaxTokens(i, generateCount) + prevRemainingTokens;
+
+        // gooseai
+        // const maxTokens = 500; // gooseai
+
         let response;
         try {
           console.re.log(`generator:tokens> [${i}] generating with max tokens = ${maxTokens}`);
-          // response = await this.openai.generateChat(messages, {max_tokens: maxTokens});
-          response = await this.gooseai.generate(messages, { min_tokens: maxTokens / 2, max_tokens: maxTokens });
+
+          // openai
+          response = await this.openai.generateChat(messages, { max_tokens: maxTokens });
+
+          // gooseai
+          // response = await this.gooseai.generate(messages, { min_tokens: maxTokens / 2, max_tokens: maxTokens });
         } catch(generateErr) {
           console.re.error(generateErr);
           continue;
@@ -211,19 +216,21 @@ module.exports = class EpisodeGenerator {
           continue;
         }
 
-        console.re.log(`generator:generate> ${response.status} ${response.statusText}: ${JSON.stringify(response.data)}`);
+        console.re.log(`generator:generate> ${JSON.stringify(response)}`);
   
-        // if (response.status === 200 && 
-        //   response.data && 
-        //   response.data.choices.length > 0
-        // ){
-        if (response) {
-          // console.re.log(`generator:generate> ${response.data.choices[0].message.content}`);
-          // messages.push(response.data.choices[0].message);
-          // prevRemainingTokens = maxTokens - response.data.usage.completion_tokens;
-          // if (prevRemainingTokens < 0) prevRemainingTokens = 0;
-          messages.push(response);
-          prevRemainingTokens = 0;
+        // openai
+        if (response.choices.length > 0){
+        // gooseai
+        // if (response) {
+          console.re.log(`generator:generate> ${response.choices[0].message.content}`);
+          messages.push(response.choices[0].message);
+          prevRemainingTokens = maxTokens - response.usage.completion_tokens;
+          if (prevRemainingTokens < 0) prevRemainingTokens = 0;
+
+          // gooseai
+          // messages.push(response);
+          // prevRemainingTokens = 0;
+
           console.re.log(`generator:generate> LEFTOVER TOKENS = ${prevRemainingTokens}`);
         } else {
           console.re.warn(`generator:generate> no responses data and/or choices`);
@@ -232,32 +239,27 @@ module.exports = class EpisodeGenerator {
   
       var rawTxtStory;
       var episodeName;
-      const service = "gooseai"; // "openai";
-      if (this.continue) { // only process latest episode in the continue saga
+      const service = "openai"; // openai, gooseai
+      let storyMessages = [];
+      if (this.continue) { 
         episodeName = `episode-${currentUserPrompt.date.replaceAll(":", "-")}-${this.episodeNumber.toString().padStart(3, '0')}-part-${this.continueCount + 1}-${service}-${currentUserPrompt.user}`;
-
-        // openai chat response
-        // rawTxtStory = currentUserPrompt.prompt + "\n" + messages.splice(this.currentMessages.length)
-        //   .filter((msg) => msg.role === "assistant")
-        //   .map((msg) => msg.content)
-        //   .join("\n");
-
-        rawTxtStory = currentUserPrompt.prompt + "\n" + messages.splice(this.currentMessages.length).join("\n");
+        storyMessages = messages.splice(this.currentMessages.length); // only process latest episode in the continue saga
       } else {
         episodeName = `episode-${currentUserPrompt.date.replaceAll(":", "-")}-${this.episodeNumber.toString().padStart(3, '0')}-${service}-${currentUserPrompt.user}`;
-
-        // openai chat response
-        // rawTxtStory = currentUserPrompt.prompt + "\n" + messages
-        //   .filter((msg) => msg.role === "assistant")
-        //   .map((msg) => msg.content)
-        //   .join("\n");
-
-        console.re.log(`generator:messages>`, messages);
-        
-        rawTxtStory = currentUserPrompt.prompt + "\n" + messages.splice(this.currentMessages.length).join("\n");
+        storyMessages = messages;
+        console.re.log(`generator:messages>`, JSON.stringify(messages));
       }
-      // const aiModel = this.openai.getCurrentModel();
-      const aiModel = this.gooseai.getCurrentModel();
+
+      // openai
+      rawTxtStory = currentUserPrompt.prompt + "\n" + storyMessages
+        .filter((msg) => msg.role === "assistant")
+        .map((msg) => msg.content)
+        .join("\n");
+
+      // gooseai
+      // rawTxtStory = currentUserPrompt.prompt + "\n" + storyMessages.join("\n");
+
+      const aiModel = this.openai.getCurrentModel();
 
       const rawEpisode = {
         name: episodeName,
@@ -268,9 +270,10 @@ module.exports = class EpisodeGenerator {
         story: rawTxtStory,
         //ai_img_background: img_b64
       };
+
+      // openai
       // await this.moderateEpisode(rawEpisode); skip auto-moderation
       this.rawEpisodeQueue.push(rawEpisode); // comment this out if moderation enabled
-      
 
       this.episodeNumber += 1;
       this.continue = false;
@@ -282,85 +285,6 @@ module.exports = class EpisodeGenerator {
 
     setTimeout(this.runGeneratorV3.bind(this), 100);
   }
-
-  /**
-   * Run Goops & Goblins AI generation loop using OpenAI to generate responses.
-   * 
-   * Keep an eye on usage as each request costs $$$:
-   * https://platform.openai.com/account/usage
-   * 
-   */
-    async runGoopsAndGoblinsOpenAIGenerator() {
-      if (!this.running) return;
-      if (this.userPromptQueue.length < 1) {
-        setTimeout(this.runGoopsAndGoblinsOpenAIGenerator.bind(this), 100);
-        return;
-      }
-  
-      var currentUserPrompt = this.userPromptQueue.shift();
-      const currentLocation = "goopsea-and-goblins";
-      try {
-        const currentIndex = this.currentMessages.length;
-        if (this.continueCount == 0) {
-          this.currentMessages = [];
-          this.currentMessages.push({role: "system", content: this.setupPrompt});
-          this.currentMessages.push({role: "user", content: currentUserPrompt.prompt});
-        } else {
-          this.currentMessages.push({role: "user", content: currentUserPrompt.prompt});
-          console.re.log(`continuing previous episode, current episode arc = ${this.continueCount + 1} episodes`);
-        }
-          
-        var generateCount = 1;
-        for(var i=0; i<generateCount; ++i) {
-          var response;
-          try {
-            const maxTokens = 1024;
-            response = await this.openai.generateChat(this.currentMessages, {max_tokens: maxTokens});
-          } catch(generateErr) {
-            console.re.error(generateErr);
-            continue;
-          }
-          if (!response) {
-            console.re.warn(`openai:generateChat> null generate response, skipping...`);
-            continue;
-          }
-  
-          console.re.log(`${response.status} ${response.statusText}: ${JSON.stringify(response.data)}`);
-    
-          if (response.data && response.data.choices.length > 0){
-            console.re.log(`openai:generateChat> ${response.data.choices[0].message.content}`);
-            this.currentMessages.push(response.data.choices[0].message);
-          } else {
-            console.re.warn(`openai:generateChat> no responses data and/or choices`);
-          }
-        }
-        
-        const episodeName = `adventure-${currentUserPrompt.date}-${(this.continueCount + 1).toString().padStart(3, '0')}`;
-        const rawTxtStory = currentUserPrompt.prompt + "\n" + this.currentMessages.splice(currentIndex)
-            .filter((msg) => msg.role === "assistant")
-            .map((msg) => msg.content)
-            .join("\n");
-        const aiModel = this.openai.getCurrentModel();
-        
-        const rawEpisode = {
-          name: episodeName,
-          date: currentUserPrompt.date,
-          user: currentUserPrompt.user,
-          model: aiModel,
-          location: currentLocation,
-          story: rawTxtStory
-        };
-        // await this.moderateEpisode(rawEpisode); skip auto-moderation
-        this.rawEpisodeQueue.push(rawEpisode); // comment this out if moderation enabled
-  
-        this.continueCount++;
-      } catch (err) {
-        console.re.warn(`runOpenAIGenerator> Error generating prompt for ${currentUserPrompt.user}`);
-        console.re.error(err);
-      }
-  
-      setTimeout(this.runGoopsAndGoblinsOpenAIGenerator.bind(this), 100);
-    }
 
   /**
    * Get the number of tokens to have the ai generate.
@@ -638,10 +562,10 @@ module.exports = class EpisodeGenerator {
         
         // ElevenLabsTTS
         base64Audio =
-            actor === "goopsea" ? await this.tts.textToSpeech(chunk) // default narrator voice for Goops
-            // : actor === "jack" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-D`)
-            // : actor === "woadie" ? await this.tts.textToSpeech(chunk, `de-DE-${voiceType}-D`)
-            // : actor === "narrator" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-I`)
+            actor === "goopsea" ? await this.tts.textToSpeech(chunk) // default narrator voice for Goops (Brian)
+            : actor === "jack" ? await this.tts.textToSpeech(chunk, "bIHbv24MWmeRgasZH58o") // Will
+            : actor === "woadie" ? await this.tts.textToSpeech(chunk, "onwK4e9ZLuTAKqWW03F9") // Daniel
+            : actor === "narrator" ? await this.tts.textToSpeech(chunk, "cjVigY5qzO86Huf0OWal") // Eric
             : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor).voice_id); // random voice for everyone else
       } catch (error) {
         console.re.warn(`TTS error - problem generating audio ${error.name}`);

@@ -27,7 +27,7 @@ function formatShortPrompt(rawPrompt) {
       actorCode == "j" ? "Jack" : 
       actorCode == "w" ? "Woadie" : 
       match[1];
-    formattedPrompt += `${actor}: ${dialog}\n`;
+    formattedPrompt += `${actor} ${chatLogDivider} ${dialog}\n`;
 
     lastActor = actor;
   }

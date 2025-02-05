@@ -1,22 +1,18 @@
-const { Configuration, OpenAIApi } = require("openai");
+import OpenAI from 'openai';
 
-module.exports = class OpenAIClient {
+export class OpenAIClient {
   constructor() {
-    this.loadOpenAI();
-    //this.model = "gpt-3.5-turbo";
-    this.model = "gpt-3.5-turbo-16k";
-    // this.model = "gpt-4";
-  }
-
-  loadOpenAI() {
-    this.configuration = new Configuration({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-    this.openai = new OpenAIApi(this.configuration);
+    // https://platform.openai.com/docs/pricing
+    this.openai = new OpenAI();
+    this.model = "gpt-3.5-turbo";
+    // this.model = "gpt-4-turbo";
   }
 
   /**
    * Get the currently loaded AI model.
+   * 
+   * Monitor cost here: https://platform.openai.com/usage
+   * 
    * @returns promise
    */
   getCurrentModel() {
@@ -26,31 +22,6 @@ module.exports = class OpenAIClient {
   /////////////////////////
   // OpenAI API Endpoints /
   /////////////////////////
-
-  /**
-   * Generate an AI response for given prompt.
-   * https://platform.openai.com/docs/api-reference/completions/create
-   * 
-   * Note: only compatimble with Legacy GPT-3 models
-   * https://platform.openai.com/docs/models/whisper
-   * 
-   * @param {string} prompt a string or array of strings
-   * @param {object} options additional generate options
-   * @returns promise that will return AI generated response
-   */
-  generate(prompt, options = {}) {
-    return this.openai.createCompletion({
-      model: "davinci", //this.getCurrentModel(),
-      prompt: prompt,
-      temperature: 0.9,
-      max_tokens: 150,
-      top_p: 1,
-      frequency_penalty: 0.0,
-      presence_penalty: 0.6,
-      // stop: [" Goopsea:", " Jack:", " Woadie:"],
-      ...options
-    });
-  }
 
   /**
    * Generate chat completion for list of messages.
@@ -65,16 +36,12 @@ module.exports = class OpenAIClient {
    * @returns promise that will return AI chat completion
    */
   generateChat(messages=[], options = { max_tokens: 120 }) {
-    return this.openai.createChatCompletion({
+    return this.openai.chat.completions.create({
       model: this.model,
       messages,
-      // temperature: 0.9, // default 1
-      // top_p: 1, // 1 default
-      // frequency_penalty: 1.0, // 0 default
-      presence_penalty: -1.0, // 0 default
-      // stop: [" Goopsea:", " Jack:", " Woadie:"],
-      ...options
-    });
+      store: false,
+      ...options,
+  });
   }
 
   /**
