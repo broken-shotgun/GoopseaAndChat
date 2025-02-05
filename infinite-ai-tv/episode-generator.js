@@ -27,54 +27,53 @@ module.exports = class EpisodeGenerator {
     this.lineRegex = new RegExp(`^([^\n\r${this.chatLogDivider}]*)${this.chatLogDivider} (.+)$`, "i");
     this.prevModifierIndex = -1
     this.setupPrompt = `
-      You are generating a television screenplay between the following characters: Goopsea, Jack, and Woadie. 
-      Goopsea is a humorous overweight cat, Woadie is a blissfully ignorant frog dog, and Jack is their awkward goofball owner.  
-      
-      Every line should be formatted like this:
-      CHARACTER ${this.chatLogDivider} LINE OF DIALOG
-      
-      Every line should end with a newline.
-      Every line should be dialog between the characters specified above.
-      
-      Here is an example: 
-      Goopsea ${this.chatLogDivider} Hi it's me, I like to eat lasagna!
-      Jack ${this.chatLogDivider} Ouch, my back!
-      Woadie ${this.chatLogDivider} Who's back?
-      `;
+You are generating a television screenplay between the following characters: Goopsea, Jack, and Woadie.
+Goopsea is a humorous overweight cat, Woadie is a blissfully ignorant frog dog, and Jack is their awkward goofball owner.
+
+Every line should be formatted like this:
+CHARACTER ${this.chatLogDivider} LINE OF DIALOG
+
+Every line should end with a newline.
+Every line should be dialog between the characters specified above.
+
+Here is an example:
+Goopsea ${this.chatLogDivider} Hi it's me, I like to eat lasagna!
+Jack ${this.chatLogDivider} Ouch, my back!
+Woadie ${this.chatLogDivider} Who's back?`;
     // https://en.wikipedia.org/wiki/The_Thirty-Six_Dramatic_Situations
     this.modifiers = shuffle([
       "Continue the script and focus on the initial topic.",
-      "Continue the script and make the characters experience or achieve something amazing.",
-      "Continue the script and make the characters experience a downfall and have an unhappy ending.",
-      "Continue the script and have one of the characters fail.",
-      "Continue the script make it a comedy.",
-      "Continue the script and make it a tragedy.",
+      // "Continue the script and make the characters experience or achieve something amazing.",
+      // "Continue the script and make the characters experience a downfall and have an unhappy ending.",
+      // "Continue the script and have one of the characters fail.",
+      // "Continue the script make it a comedy.",
+      // "Continue the script and make it a tragedy.",
       "Continue the script and make it have a sad ending.",
-      "Continue the script and make it have a happy ending.",
-      // "Continue the script and introduce a celebrirty or famous character from a work of fiction.",
+      // "Continue the script and make it have a happy ending.",
+      "Continue the script and introduce a celebrirty or famous character from a work of fiction.",
       // "Continue the script and make all the characters breakout into a WWE style wrestling match.",
-      // "Continue the script and give one of the characters a supernatural power.",
-      // "Continue the script and introduce an apocalyptic event.",
+      "Continue the script and give one of the characters a supernatural power.",
+      "Continue the script and introduce an apocalyptic event.",
       // "Continue the script and make it into a heroes story.",
-      "Continue the script and make one of the characters gain something new",
+      // "Continue the script and make one of the characters gain something new",
       "Continue the script and introduce a conflict.",
       // "Continue the script and make one of the characters master a new thing.",
       "Continue the script and make one of the characters fall victim to madness.",
       "Continue the script and make one of the characters get revenge",
       // "Continue the script and introduce a sudden disaster.",
-      // "Continue the script and make one of the characters start a new enterprise based off the script so far.",
-      // "Continue the script and make one of the characters self-sacrifice for an ideal.",
-      // "Continue the script and make one of the characters self-sacrifice for kin.",
-      // "Continue the script and make one of the characters self-sacrifice for passion.",
+      "Continue the script and make one of the characters start a new enterprise based off the script so far.",
+      "Continue the script and make one of the characters self-sacrifice for an ideal.",
+      "Continue the script and make one of the characters self-sacrifice for kin.",
+      "Continue the script and make one of the characters self-sacrifice for passion.",
       "Continue the script and make one of the characters face off against a rival.",
-      // "Continue the script and make one of the characters have a conflict with a god.",
+      "Continue the script and make one of the characters have a conflict with a god.",
       "Continue the script and make one of the characters deal with remorse.",
       "Continue the script and make one of the characters overcome a monster.",
-      // "Continue the script and make one of the characters go on a quest.",
+      "Continue the script and make one of the characters go on a quest.",
       "Continue the script and make one of the characters change their ways and become a better individual.",
-      // "Continue the script and make one of the characters go on a voyage.",
-      // "Continue the script and have the characters experience a natural disaster.",
-      // "Continue the script and have the characters experience an unnatural disaster."
+      "Continue the script and make one of the characters go on a voyage.",
+      "Continue the script and have the characters experience a natural disaster.",
+      "Continue the script and have the characters experience an unnatural disaster."
     ]);
   }
 
@@ -175,7 +174,7 @@ module.exports = class EpisodeGenerator {
         // messages.push(currentUserPrompt.prompt);
       }
 
-      var generateCount = 2;
+      var generateCount = 3;
       var modifierIndex = getRandomInt(this.modifiers.length);
       while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
       this.prevModifierIndex = modifierIndex;
@@ -293,14 +292,18 @@ module.exports = class EpisodeGenerator {
    * @returns max number of tokens to generate
    */
   getMaxTokens(generateIndex, generateCount) {
-    return (generateIndex==0) ? 420 :
-      (generateIndex==1) ? 120 :
+    return (generateIndex==0) ? 200 :
+      (generateIndex==1) ? 300 :
       // (generateIndex==(generateCount-1)) ? 32 :
-      80;
+      100;
   }
 
   /**
-   * Mark the current episode for completion.
+   * Mark the current episode for continuation.
+   * 
+   * The next episode will have the context of the previous episode or episodes.
+   * 
+   * It will remember multiple episodes if continue has been called for each.
    */
   markContinue() {
     this.continue = true;
@@ -346,58 +349,6 @@ module.exports = class EpisodeGenerator {
   }
 
   /**
-   * Runs story through OpenAI moderation endpoint.
-   * 
-   * If episode passes mod check, add to episode processor queue.
-   * If episode fails mod check, mark story as DIRTY and add to raw/dirty folder for manual review.
-   * 
-   * @param {RawEpisode} rawEpisode unprocessed episode
-   */
-  async moderateEpisode(rawEpisode) {
-    var modResponse;
-    try {
-      modResponse = await this.openai.moderate(rawEpisode.story);
-      console.re.log(`moderateEpisode> ${modResponse.status} ${modResponse.statusText}`);
-      console.re.log(JSON.stringify(modResponse.data));
-    } catch (err) {
-      console.re.warn(`openai:moderate> Error moderating story for ${rawEpisode.user}`);
-      console.re.error(err);
-    }
-
-    if (modResponse && modResponse.data && modResponse.data.results.length > 0) {
-      // const flagged = modResponse.data.results[0].flagged;
-      const modCategories = modResponse.data.results[0].categories;
-
-      if (
-        modCategories["hate"] ||
-        modCategories["hate/threatening"] ||
-        modCategories["self-harm"] ||
-        modCategories["sexual/minors"]
-      ) {
-        const dirtyFilename = `episodes/raw/dirty/DITRY-${rawEpisode.date.replaceAll(":", "-")}-${rawEpisode.user}.json`
-        
-        console.re.warn(`✖✖✖ FILTH! ✖✖✖ Story failed moderation check, saving to ${dirtyFilename}...`);
-        
-        fs.writeFile(dirtyFilename, JSON.stringify(rawEpisode), "utf-8", (err) => {
-          if (err) console.re.error(err);
-          else console.re.warn(`☠ DIRTY EPISODE OF GOOPSEA READY FOR MANUAL REVIEW! ☠`);
-        });
-      } else {
-        console.re.log(`Passed mod check!  Adding story to episode processing queue...`);
-
-        this.rawEpisodeQueue.push(rawEpisode);
-      }
-    } else {
-      const rawEpisodeJsonFilename = `episodes/raw/inbox/story-${rawEpisode.date.replaceAll(":", "-")}-${rawEpisode.user}.json`
-      console.re.warn(`Could not auto-moderate: Adding story to inbox for manual review.\nManually approve story with:\ncurl -X POST -H "Content-Type: application/json" -d @${rawEpisodeJsonFilename} http://localhost:3000/addStory`);
-      fs.writeFile(rawEpisodeJsonFilename, JSON.stringify(rawEpisode), "utf-8", (err) => {
-        if (err) console.re.error(err);
-        else console.re.log(`Saved story to ${rawEpisodeJsonFilename}`);
-      });
-    }
-  }
-
-  /**
    * Run episode process loop.
    * 
    * 1. check if story in queue to process, poll from queue if not empty
@@ -414,21 +365,6 @@ module.exports = class EpisodeGenerator {
     }
 
     setTimeout(this.runProcessor.bind(this), 100);
-  }
-
-  /**
-   * Run Goops & Goblins process loop.
-   */
-  async runGoopsAndGoblinsProcessor() {
-    if (!this.running) return;
-
-    if (this.rawEpisodeQueue.length >= 1) {
-      const rawEpisode = this.rawEpisodeQueue.shift();
-      const episode = await this.processEpisode(rawEpisode, true);
-      this.saveEpisode(rawEpisode.name, episode);
-    }
-
-    setTimeout(this.runGoopsAndGoblinsProcessor.bind(this), 100);
   }
 
   /**

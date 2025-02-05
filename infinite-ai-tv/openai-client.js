@@ -43,30 +43,4 @@ export class OpenAIClient {
       ...options,
   });
   }
-
-  /**
-   * https://platform.openai.com/docs/api-reference/images
-   * @param {string} prompt 
-   * @returns promise that will return AI generated image (base64 encoded)
-   */
-  generateImage(prompt) {
-    return this.openai.createImage({
-      prompt: `a location background based on the following story prompt: ${prompt}`,
-      n: 1,
-      size: "256x256", // 8 pixels per unit //"512x512", // 16 pixels per unit //"1024x1024", // 68.5 pixels per unit
-      response_format: "b64_json"
-    });
-  }
-
-  /**
-   * Classifies if text violates OpenAI's Content Policy.
-   * https://platform.openai.com/docs/api-reference/moderations/create
-   * @param {string} input 
-   * @returns promise that will return moderationg categories
-   */
-  moderate(input) {
-    return this.openai.createModeration({
-      input: JSON.stringify(input)
-    });
-  }
 };
