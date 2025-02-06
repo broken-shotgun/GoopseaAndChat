@@ -4795,8 +4795,8 @@ MonoBehaviour:
   goopseaAndGoblins: {fileID: 0}
   useAiImageGen: 0
   establishingShotHouse: {fileID: 1681660850}
-  introAudioClip: {fileID: 8300000, guid: 9f82e07f3e21f3a47991c0a9ad0e0833, type: 3}
-  endAudioClip: {fileID: 8300000, guid: c465adea7e11f8a47a5f89f63ffe62cc, type: 3}
+  introAudioClip: {fileID: 8300000, guid: 9f071e2045c4212458b642fb8973b818, type: 3}
+  endAudioClip: {fileID: 8300000, guid: ef1b2492dda1b51409086330761e2652, type: 3}
   subtitleText: {fileID: 1339881930}
   episodeName: {fileID: 269456461}
   pauseText: {fileID: 1835427793}
@@ -4827,8 +4827,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: fcf79c2552b75784093ce53517bb55b5, type: 3}
-  m_Resource: {fileID: 8300000, guid: fcf79c2552b75784093ce53517bb55b5, type: 3}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
