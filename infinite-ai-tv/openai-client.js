@@ -3,8 +3,12 @@ import OpenAI from 'openai';
 export class OpenAIClient {
   constructor() {
     // https://platform.openai.com/docs/pricing
-    this.openai = new OpenAI();
-    this.model = "gpt-3.5-turbo";
+    this.openai = new OpenAI({
+      baseURL: "http://localhost:11434/v1", // Local Ollama API endpoint
+      apiKey: "ollama" // Dummy key, not used by Ollama
+    });
+    //this.model = "gpt-3.5-turbo";
+    this.model = "gpt-oss:20b";
     // this.model = "gpt-4-turbo";
   }
 
