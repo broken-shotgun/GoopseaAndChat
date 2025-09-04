@@ -28,7 +28,7 @@ module.exports = class EpisodeGenerator {
     this.lineRegex = new RegExp(`^([^\n\r${this.chatLogDivider}]*)${this.chatLogDivider} (.+)$`, "i");
     this.prevModifierIndex = -1
     this.setupPrompt = `
-You are generating a script for an episode of a cartoon between the following characters: Goopsea, Jack, and Woadie.
+You are generating a script for an episode of a funny cartoon between the following characters: Goopsea, Jack, and Woadie.
 Goopsea is a depressed cynical overweight cat, Woadie is a dumb but wildly curious frog dog, and Jack is an anxious overworked accountant.
 
 Every line should be formatted like this:
@@ -36,26 +36,23 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
 
 Every line of dialog should end with a newline.
 Every line of dialog should be between the characters: Goopsea, Jack, and Woadie.
-Keep the episode entertaining and on topic from the initial prompt.
-If the dialog goes off topic for any reason, find a way to tie it back to the very first user prompt.
+Keep the episode interesting, engaging and on topic from the initial user prompt.
 
 Here is an example:
-Goopsea ${this.chatLogDivider} Hi it's me, I like to eat lasagna!
+Goopsea ${this.chatLogDivider} Hi it's me, I like to eat!
 Jack ${this.chatLogDivider} Ouch, my back!
-Woadie ${this.chatLogDivider} Who's back?
-
-Wait for the initial episode prompt and then begin generating the script.`;
+Woadie ${this.chatLogDivider} Who's back?`;
     // https://en.wikipedia.org/wiki/The_Thirty-Six_Dramatic_Situations
     this.modifiers = shuffle([
       "Continue the script and focus on the initial topic.",
       "Continue the script and make the characters experience or achieve something amazing.",
       // "Continue the script and make the characters experience a downfall and have an unhappy ending.",
       // "Continue the script and have one of the characters fail.",
-      "Continue the script make it a comedy.",
+      // "Continue the script make it a comedy.",
       "Continue the script and make it a tragedy.",
       "Continue the script and make it have a sad ending.",
       // "Continue the script and make it have a happy ending.",
-      "Continue the script and introduce a celebrirty or famous character from a work of fiction.",
+      // "Continue the script and introduce a celebrirty or famous character from a work of fiction.",
       // "Continue the script and make all the characters breakout into a WWE style wrestling match.",
       "Continue the script and give one of the characters a supernatural power.",
       "Continue the script and introduce an apocalyptic event.",
@@ -185,13 +182,17 @@ Wait for the initial episode prompt and then begin generating the script.`;
         // messages.push(currentUserPrompt.prompt);
       }
 
-      var generateCount = 5;
+      var generateCount = 3;
       var modifierIndex = getRandomInt(this.modifiers.length);
       while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
       this.prevModifierIndex = modifierIndex;
       //var prevRemainingTokens = 0;
       for(var i=0; i<generateCount; ++i) {
-        if (i==1) {
+        const isEndOfEpisode = i == generateCount-1;
+        if (isEndOfEpisode) {
+          messages.push({role: "system", content: "Wrap up the episode in a satisfying way." });
+        }
+        else if (i > 0) {
           var midPrompt = this.modifiers[modifierIndex];
           console.re.log(`generator:modify> ${midPrompt.toUpperCase()}`);
 
@@ -203,7 +204,7 @@ Wait for the initial episode prompt and then begin generating the script.`;
         }
 
         // openai
-        const maxTokens = 300; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
+        const maxTokens = isEndOfEpisode ? 1000 : 300; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
 
         // gooseai
         // const maxTokens = 500; // gooseai
