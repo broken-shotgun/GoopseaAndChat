@@ -6,6 +6,7 @@ const { chunkify, getRandomInt, shuffle } = require("./utils");
 const ElevenLabsTTS = require("./elevenlabs-tts-client");
 //const KoboldAIClient = require("./kobold-client");
 const { OpenAIClient } = require("./openai-client");
+const { raw } = require("express");
 // const GooseAIClient = require("./goose-client");
 
 module.exports = class EpisodeGenerator {
@@ -82,10 +83,16 @@ Wait for the initial episode prompt and then begin generating the script.`;
   }
 
   /**
+   * @typedef {Object} UserPromptOptions
+   * @property {boolean} skiptts Skips generating TTS audio for this prompt. (For testing)
+   */
+
+  /**
    * @typedef {Object} UserPrompt
    * @property {string} user Twitch username who submitted this prompt
    * @property {string} date timestamp for when reward was redeemed
    * @property {string} prompt formatted episode prompt
+   * @property {UserPromptOptions} options 
    */
 
   /**
@@ -271,6 +278,7 @@ Wait for the initial episode prompt and then begin generating the script.`;
         model: aiModel,
         location: currentLocation,
         story: rawTxtStory,
+        skiptts: currentUserPrompt.skiptts,
         //ai_img_background: img_b64
       };
 
@@ -380,6 +388,7 @@ Wait for the initial episode prompt and then begin generating the script.`;
    * @property {string} location the episode location id
    * @property {string} story formatted ai generated story
    * @property {string} ai_img_background base 64 generated image for background
+   * @property {boolean} skiptts
    */
 
   /**
@@ -401,10 +410,9 @@ Wait for the initial episode prompt and then begin generating the script.`;
   /**
    * Process raw episode to a playable episode object.
    * @param {RawEpisode} rawEpisode raw episode json without stage directions or processed TTS
-   * @param {boolean} isAdventure if true, disables boilerplate episode crap
    * @returns a processed episode object with stage directions & base64 encoded TTS audio
    */
-  async processEpisode(rawEpisode, isAdventure=false) {
+  async processEpisode(rawEpisode) {
     const episode = {
       id: rawEpisode.name,
       date: rawEpisode.date,
@@ -414,25 +422,23 @@ Wait for the initial episode prompt and then begin generating the script.`;
       ai_img_background: rawEpisode.ai_img_background
     };
 
-    if (!isAdventure) {
-      episode.directions.push({ type: "intro" });
-      episode.directions.push({
-        type: "play-timeline",
-        target: "establishing-shot-house"
-      });
-      episode.directions.push({
-        type: "change-location",
-        target: rawEpisode.location
-      });
-      episode.directions.push({
-        type: "change-camera",
-        target: "wide",
-      });
-      episode.directions.push({
-        type: "pause",
-        duration: 1
-      });
-    }
+    episode.directions.push({ type: "intro" });
+    episode.directions.push({
+      type: "play-timeline",
+      target: "establishing-shot-house"
+    });
+    episode.directions.push({
+      type: "change-location",
+      target: rawEpisode.location
+    });
+    episode.directions.push({
+      type: "change-camera",
+      target: "wide",
+    });
+    episode.directions.push({
+      type: "pause",
+      duration: 1
+    });
     
     const formattedLines = rawEpisode
       .story
@@ -459,7 +465,7 @@ Wait for the initial episode prompt and then begin generating the script.`;
 
       if (dialog === "") continue;
 
-      await this.addLine(actor, dialog, episode);
+      await this.addLine(actor, dialog, episode, rawEpisode.skiptts);
 
       episode.directions.push({
         type: "pause",
@@ -467,12 +473,12 @@ Wait for the initial episode prompt and then begin generating the script.`;
       });
     }
     
-    if (!isAdventure) episode.directions.push({ type: "end" });
+    episode.directions.push({ type: "end" });
     
     return episode;
   }
 
-  async addLine(actor, dialog, episode) {
+  async addLine(actor, dialog, episode, skiptts) {
     const chunks = chunkify(dialog);
     for (const chunk of chunks) {
       // vary camera angle for every chunk of dialoge
@@ -488,27 +494,29 @@ Wait for the initial episode prompt and then begin generating the script.`;
       // var base64Audio = "";
       //*
       var base64Audio;
-      try {
-        // Google TTS
-        // const voiceType = "Standard"; //"Neural2";
-        // base64Audio =
-        //   actor === "jack" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-D`, { pitch: 4.8, })
-        //     : actor === "goopsea" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-J`, { pitch: -1.8, })
-        //     : actor === "woadie" ? await this.tts.textToSpeech(chunk, `de-DE-${voiceType}-D`, { pitch: -4.8, speakingRate: 1.4 })
-        //     : actor === "narrator" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-I`, { pitch: -3.6, speakingRate: 1.11 })
-        //     : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor), this.tts.getRandomPitch());
+      if (!skiptts) {
+        try {
+          // Google TTS
+          // const voiceType = "Standard"; //"Neural2";
+          // base64Audio =
+          //   actor === "jack" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-D`, { pitch: 4.8, })
+          //     : actor === "goopsea" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-J`, { pitch: -1.8, })
+          //     : actor === "woadie" ? await this.tts.textToSpeech(chunk, `de-DE-${voiceType}-D`, { pitch: -4.8, speakingRate: 1.4 })
+          //     : actor === "narrator" ? await this.tts.textToSpeech(chunk, `en-US-${voiceType}-I`, { pitch: -3.6, speakingRate: 1.11 })
+          //     : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor), this.tts.getRandomPitch());
 
-        // TODO update for WinTTS
-        
-        // ElevenLabsTTS
-        base64Audio =
-            actor === "goopsea" ? await this.tts.textToSpeech(chunk) // default narrator voice for Goops (Brian)
-            : actor === "jack" ? await this.tts.textToSpeech(chunk, "bIHbv24MWmeRgasZH58o") // Will
-            : actor === "woadie" ? await this.tts.textToSpeech(chunk, "onwK4e9ZLuTAKqWW03F9") // Daniel
-            : actor === "narrator" ? await this.tts.textToSpeech(chunk, "cjVigY5qzO86Huf0OWal") // Eric
-            : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor).voice_id); // random voice for everyone else
-      } catch (error) {
-        console.re.warn(`TTS error - problem generating audio ${error.name}`);
+          // TODO update for WinTTS
+          
+          // ElevenLabsTTS
+          base64Audio =
+              actor === "goopsea" ? await this.tts.textToSpeech(chunk) // default narrator voice for Goops (Brian)
+              : actor === "jack" ? await this.tts.textToSpeech(chunk, "bIHbv24MWmeRgasZH58o") // Will
+              : actor === "woadie" ? await this.tts.textToSpeech(chunk, "onwK4e9ZLuTAKqWW03F9") // Daniel
+              : actor === "narrator" ? await this.tts.textToSpeech(chunk, "cjVigY5qzO86Huf0OWal") // Eric
+              : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor).voice_id); // random voice for everyone else
+        } catch (error) {
+          console.re.warn(`TTS error - problem generating audio ${error.name}`);
+        }
       }
       //*/
 

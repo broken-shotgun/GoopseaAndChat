@@ -28,14 +28,16 @@ $(document).ready(function () {
 
   $("form").on("submit", function (event) {
     event.preventDefault();
-    var userPrompt = {
+    const shouldContinue = $("#continue").is(":checked");
+    const shouldSkipTTS = $("#skiptts").is(":checked");
+    const userPrompt = {
       user: $("#author").val(),
       prompt: "",
+      skiptts: shouldSkipTTS,
     };
     userPrompt.prompt = $("#message").val();
-    var shouldContinue = $("#continue").is(":checked");
     console.log(JSON.stringify(userPrompt));
-    var submitUrl = shouldContinue
+    const submitUrl = shouldContinue
       ? "http://localhost:3000/continue"
       : "http://localhost:3000/addPromptManual";
     $.ajax({

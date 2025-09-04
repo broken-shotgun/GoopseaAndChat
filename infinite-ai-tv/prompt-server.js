@@ -127,11 +127,15 @@ app.get("/addPrompt", (req, res) => {
 app.post("/addPromptManual", (req, res) => {
   const user = req.body.user;
   const prompt = req.body.prompt;
+  const skiptts = req.body.skiptts;
 
   const userPrompt = {
     user,
     date: new Date(Date.now()).toISOString(),
-    prompt
+    prompt,
+    options: {
+      skiptts,
+    }
   };
 
   if (user == "aipd") {
@@ -155,12 +159,16 @@ app.post("/addPromptManual", (req, res) => {
 app.post("/continue", (req, res) => {
   const user = req.body.user;
   const prompt = req.body.prompt;
+  const skiptts = req.body.skiptts;
 
   generator.markContinue();
   generator.addPrompt({
     user,
     date: new Date(Date.now()).toISOString(),
-    prompt
+    prompt,
+    options: {
+      skiptts,
+    }
   });
 
   res.status(200).send({message: "Success! The current story will continue"});
