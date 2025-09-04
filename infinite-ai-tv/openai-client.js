@@ -9,6 +9,7 @@ export class OpenAIClient {
     });
     //this.model = "gpt-3.5-turbo";
     this.model = "gpt-oss:20b";
+    // this.model = "deepseek-r1:8b";
     // this.model = "gpt-4-turbo";
   }
 

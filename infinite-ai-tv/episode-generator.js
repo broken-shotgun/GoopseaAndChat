@@ -278,7 +278,7 @@ Wait for the initial episode prompt and then begin generating the script.`;
         model: aiModel,
         location: currentLocation,
         story: rawTxtStory,
-        skiptts: currentUserPrompt.skiptts,
+        skiptts: currentUserPrompt.options.skiptts,
         //ai_img_background: img_b64
       };
 
