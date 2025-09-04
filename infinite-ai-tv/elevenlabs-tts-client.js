@@ -3,7 +3,8 @@ const { hash, streamToBase64String } = require("./utils");
 
 module.exports = class ElevenLabsTTS {
   constructor() {
-    this.modelId = "eleven_turbo_v2_5"; // double check the voices available match to the model specified: eleven_turbo_v2_5, eleven_multilingual_v2
+    // this.modelId = "eleven_turbo_v2_5"; // double check the voices available match to the model specified: eleven_turbo_v2_5, eleven_multilingual_v2
+    this.modelId = "eleven_flash_v2_5"; // 50% cheapear and way faster to generate
   }
 
   /**

@@ -31,7 +31,7 @@ module.exports = class EpisodeGenerator {
 You are a seasoned comedy writer for Adult Swim with a penchant for the weird and unsual.
 You are writing a script for an episode of a funny cartoon between the following characters: Goopsea, Jack, and Woadie.
 
-- Goopsea is a depressed cynical overweight cat.  Goopsea hates everything... except food.
+- Goopsea is a depressed cynical overweight cat.  Goopsea LOVES food.
 - Woadie is a wildly curious frog dog that questions everything, even the blatantly obvious.
 - Jack is an anxious overworked accountant. Jack dreams of becoming a battle rapper like Eminem and always looks for an opportunity to rhyme.
 
@@ -203,7 +203,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         }
 
         // openai
-        const maxTokens = isEndOfEpisode ? 1000 : 300; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
+        const maxTokens = isEndOfEpisode ? 1000 : 192; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
 
         // gooseai
         // const maxTokens = 500; // gooseai
@@ -261,7 +261,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
       }
 
       // openai
-      rawTxtStory = currentUserPrompt.prompt + "\n" + storyMessages
+      rawTxtStory = storyMessages
         .filter((msg) => msg.role === "assistant")
         .map((msg) => msg.content)
         .join("\n");
