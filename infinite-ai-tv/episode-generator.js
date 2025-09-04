@@ -27,40 +27,44 @@ module.exports = class EpisodeGenerator {
     this.lineRegex = new RegExp(`^([^\n\r${this.chatLogDivider}]*)${this.chatLogDivider} (.+)$`, "i");
     this.prevModifierIndex = -1
     this.setupPrompt = `
-You are generating a television screenplay between the following characters: Goopsea, Jack, and Woadie.
-Goopsea is a humorous overweight cat, Woadie is a blissfully ignorant frog dog, and Jack is their awkward goofball owner.
+You are generating a script for an episode of a cartoon between the following characters: Goopsea, Jack, and Woadie.
+Goopsea is a depressed cynical overweight cat, Woadie is a dumb but wildly curious frog dog, and Jack is an anxious overworked accountant.
 
 Every line should be formatted like this:
 CHARACTER ${this.chatLogDivider} LINE OF DIALOG
 
-Every line should end with a newline.
-Every line should be dialog between the characters specified above.
+Every line of dialog should end with a newline.
+Every line of dialog should be between the characters: Goopsea, Jack, and Woadie.
+Keep the episode entertaining and on topic from the initial prompt.
+If the dialog goes off topic for any reason, find a way to tie it back to the very first user prompt.
 
 Here is an example:
 Goopsea ${this.chatLogDivider} Hi it's me, I like to eat lasagna!
 Jack ${this.chatLogDivider} Ouch, my back!
-Woadie ${this.chatLogDivider} Who's back?`;
+Woadie ${this.chatLogDivider} Who's back?
+
+Wait for the initial episode prompt and then begin generating the script.`;
     // https://en.wikipedia.org/wiki/The_Thirty-Six_Dramatic_Situations
     this.modifiers = shuffle([
       "Continue the script and focus on the initial topic.",
-      // "Continue the script and make the characters experience or achieve something amazing.",
+      "Continue the script and make the characters experience or achieve something amazing.",
       // "Continue the script and make the characters experience a downfall and have an unhappy ending.",
       // "Continue the script and have one of the characters fail.",
-      // "Continue the script make it a comedy.",
-      // "Continue the script and make it a tragedy.",
+      "Continue the script make it a comedy.",
+      "Continue the script and make it a tragedy.",
       "Continue the script and make it have a sad ending.",
       // "Continue the script and make it have a happy ending.",
       "Continue the script and introduce a celebrirty or famous character from a work of fiction.",
       // "Continue the script and make all the characters breakout into a WWE style wrestling match.",
       "Continue the script and give one of the characters a supernatural power.",
       "Continue the script and introduce an apocalyptic event.",
-      // "Continue the script and make it into a heroes story.",
-      // "Continue the script and make one of the characters gain something new",
+      "Continue the script and make it into a heroes story.",
+      "Continue the script and make one of the characters gain something new",
       "Continue the script and introduce a conflict.",
-      // "Continue the script and make one of the characters master a new thing.",
+      "Continue the script and make one of the characters master a new thing.",
       "Continue the script and make one of the characters fall victim to madness.",
       "Continue the script and make one of the characters get revenge",
-      // "Continue the script and introduce a sudden disaster.",
+      "Continue the script and introduce a sudden disaster.",
       "Continue the script and make one of the characters start a new enterprise based off the script so far.",
       "Continue the script and make one of the characters self-sacrifice for an ideal.",
       "Continue the script and make one of the characters self-sacrifice for kin.",
@@ -68,7 +72,7 @@ Woadie ${this.chatLogDivider} Who's back?`;
       "Continue the script and make one of the characters face off against a rival.",
       "Continue the script and make one of the characters have a conflict with a god.",
       "Continue the script and make one of the characters deal with remorse.",
-      "Continue the script and make one of the characters overcome a monster.",
+      // "Continue the script and make one of the characters overcome a monster.",
       "Continue the script and make one of the characters go on a quest.",
       "Continue the script and make one of the characters change their ways and become a better individual.",
       "Continue the script and make one of the characters go on a voyage.",
@@ -174,25 +178,25 @@ Woadie ${this.chatLogDivider} Who's back?`;
         // messages.push(currentUserPrompt.prompt);
       }
 
-      var generateCount = 3;
+      var generateCount = 5;
       var modifierIndex = getRandomInt(this.modifiers.length);
       while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
       this.prevModifierIndex = modifierIndex;
-      var prevRemainingTokens = 0;
+      //var prevRemainingTokens = 0;
       for(var i=0; i<generateCount; ++i) {
         if (i==1) {
           var midPrompt = this.modifiers[modifierIndex];
           console.re.log(`generator:modify> ${midPrompt.toUpperCase()}`);
 
           // openai
-          messages.push({role: "user", content: `[${midPrompt}]` });
+          messages.push({role: "system", content: midPrompt });
 
           // gooseai
           // messages.push(`[${midPrompt}]`);
         }
 
         // openai
-        const maxTokens = this.getMaxTokens(i, generateCount) + prevRemainingTokens;
+        const maxTokens = 300; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
 
         // gooseai
         // const maxTokens = 500; // gooseai
@@ -223,14 +227,14 @@ Woadie ${this.chatLogDivider} Who's back?`;
         // if (response) {
           console.re.log(`generator:generate> ${response.choices[0].message.content}`);
           messages.push(response.choices[0].message);
-          prevRemainingTokens = maxTokens - response.usage.completion_tokens;
-          if (prevRemainingTokens < 0) prevRemainingTokens = 0;
+          //prevRemainingTokens = maxTokens - response.usage.completion_tokens;
+          //if (prevRemainingTokens < 0) prevRemainingTokens = 0;
 
           // gooseai
           // messages.push(response);
           // prevRemainingTokens = 0;
 
-          console.re.log(`generator:generate> LEFTOVER TOKENS = ${prevRemainingTokens}`);
+         // console.re.log(`generator:generate> LEFTOVER TOKENS = ${prevRemainingTokens}`);
         } else {
           console.re.warn(`generator:generate> no responses data and/or choices`);
         }
@@ -292,10 +296,10 @@ Woadie ${this.chatLogDivider} Who's back?`;
    * @returns max number of tokens to generate
    */
   getMaxTokens(generateIndex, generateCount) {
-    return (generateIndex==0) ? 200 :
+    return (generateIndex==0) ? 300 :
       (generateIndex==1) ? 300 :
       // (generateIndex==(generateCount-1)) ? 32 :
-      100;
+      300;
   }
 
   /**
