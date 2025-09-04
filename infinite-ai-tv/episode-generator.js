@@ -28,20 +28,19 @@ module.exports = class EpisodeGenerator {
     this.lineRegex = new RegExp(`^([^\n\r${this.chatLogDivider}]*)${this.chatLogDivider} (.+)$`, "i");
     this.prevModifierIndex = -1
     this.setupPrompt = `
-You are generating a script for an episode of a funny cartoon between the following characters: Goopsea, Jack, and Woadie.
-Goopsea is a depressed cynical overweight cat, Woadie is a dumb but wildly curious frog dog, and Jack is an anxious overworked accountant.
+You are a seasoned comedy writer for Adult Swim with a penchant for the weird and unsual.
+You are writing a script for an episode of a funny cartoon between the following characters: Goopsea, Jack, and Woadie.
 
-Every line should be formatted like this:
+- Goopsea is a depressed cynical overweight cat.  Goopsea hates everything... except food.
+- Woadie is a wildly curious frog dog that questions everything, even the blatantly obvious.
+- Jack is an anxious overworked accountant. Jack dreams of becoming a battle rapper like Eminem and always looks for an opportunity to rhyme.
+
+- Every line should be formatted like this:
 CHARACTER ${this.chatLogDivider} LINE OF DIALOG
 
-Every line of dialog should end with a newline.
-Every line of dialog should be between the characters: Goopsea, Jack, and Woadie.
-Keep the episode interesting, engaging and on topic from the initial user prompt.
-
-Here is an example:
-Goopsea ${this.chatLogDivider} Hi it's me, I like to eat!
-Jack ${this.chatLogDivider} Ouch, my back!
-Woadie ${this.chatLogDivider} Who's back?`;
+- Every line of dialog should end with a newline.
+- Every line of the script should be dialog between the characters: Goopsea, Jack, and Woadie.
+- Keep the episode interesting, engaging, and most importantly: humorous.`;
     // https://en.wikipedia.org/wiki/The_Thirty-Six_Dramatic_Situations
     this.modifiers = shuffle([
       "Continue the script and focus on the initial topic.",

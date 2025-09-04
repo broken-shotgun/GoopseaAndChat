@@ -44,11 +44,11 @@ db.serialize(() => {
     console.re.log("New table Scores created!");
   } else {
     console.re.log('Database "Scores" ready to go!');
-    db.each("SELECT * from Scores ORDER BY score DESC LIMIT 25", (err, row) => {
-      if (row) {
-        console.re.log(`${row.user} ${row.score}`);
-      }
-    });
+    // db.each("SELECT * from Scores ORDER BY score DESC LIMIT 25", (err, row) => {
+    //   if (row) {
+    //     console.re.log(`${row.user} ${row.score}`);
+    //   }
+    // });
   }
 });
 
