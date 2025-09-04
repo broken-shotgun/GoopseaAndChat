@@ -203,7 +203,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         }
 
         // openai
-        const maxTokens = isEndOfEpisode ? 1000 : 192; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
+        const maxTokens = isEndOfEpisode ? 500 : 200; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
 
         // gooseai
         // const maxTokens = 500; // gooseai
@@ -469,7 +469,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
 
       episode.directions.push({
         type: "pause",
-        duration: 0.25 + (Math.pow(Math.E, -3) * getRandomInt(50))
+        duration: 0.25 + (getRandomInt(100) / 100.0)
       });
     }
     
