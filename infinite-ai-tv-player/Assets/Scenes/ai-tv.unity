@@ -245,7 +245,7 @@ MonoBehaviour:
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
-          m_CallState: 1
+          m_CallState: 2
 --- !u!1 &28303400
 GameObject:
   m_ObjectHideFlags: 0
@@ -4421,6 +4421,7 @@ MonoBehaviour:
   pauseText: {fileID: 1835427793}
   creditsText: {fileID: 465056888}
   speakSignal: {fileID: 11400000, guid: d277b590057599140afb2616243b4f09, type: 2}
+  speakSignalEmitter: {fileID: 2551162}
 --- !u!4 &1803962775
 Transform:
   m_ObjectHideFlags: 0

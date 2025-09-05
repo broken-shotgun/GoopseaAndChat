@@ -65,6 +65,7 @@ public class TimelineGenerator : MonoBehaviour
 
     [Header("Signals")]
     public SignalAsset speakSignal;
+    public SpeakMessageSignalReceiver speakMessageSignalReceiver;
 
     private bool isQueuePlaying = false;
     private EpisodeQueue episodeQueue = new EpisodeQueue();
@@ -440,6 +441,7 @@ public class TimelineGenerator : MonoBehaviour
 
         var controlTrack = timelineAsset.CreateTrack<ControlTrack>();
         var signalTrack = timelineAsset.CreateTrack<SignalTrack>();
+        director.SetGenericBinding(signalTrack, speakMessageSignalReceiver);
 
         var startTime = 0.0;
         TimelineClip currentCameraClip = null;
@@ -611,7 +613,6 @@ public class TimelineGenerator : MonoBehaviour
         var speakMarker = signalTrack.CreateMarker<SpeakMessageSignalEmitter>(start);
         speakMarker.message = message;
         speakMarker.voice = "Microsoft"; // TODO switch based on character
-        speakMarker.retroactive = true;
         speakMarker.asset = speakSignal;
     }
 
