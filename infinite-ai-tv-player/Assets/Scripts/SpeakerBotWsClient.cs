@@ -23,7 +23,7 @@ public class SpeakerBotWsClient : MonoBehaviour
         DebugLogConsole.AddCommandInstance("speak", "Speaks the provided text with default voice", "Speak", this);
     }
 
-    class SpeakRequest
+    public class SpeakRequest
     {
         public string id { get; set; }
         public string request { get; set; }
