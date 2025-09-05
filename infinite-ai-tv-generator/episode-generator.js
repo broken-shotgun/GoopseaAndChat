@@ -28,23 +28,25 @@ module.exports = class EpisodeGenerator {
     this.lineRegex = new RegExp(`^([^\n\r${this.chatLogDivider}]*)${this.chatLogDivider} (.+)$`, "i");
     this.prevModifierIndex = -1
     this.setupPrompt = `
-You are a seasoned comedy TV show writer that specializes in short (1-3 minute) animations.
-You are writing a script for an episode of a cartoon between the following characters: Goopsea, Jack, and Woadie.
+You are a seasoned cartoon show writer.
+You are writing a script for an episode between the following characters: Goopsea, Jack, and Woadie.
 
-- Goopsea is a holly jolly overweight cat.  Goopsea LOVES food, especially canolis.
-- Woadie is a former army trained frog dog.  Woadie talks like the drill seargent from Full Metal Jacket.
+- Goopsea is a depressed wisecracking overweight cat.  Goopsea LOVES food.
+- Woadie is a super intelligent frog dog.  He acts like Urkel from Family Matters.  Woadie was a secret government experiment that escaped and so he is always hiding from government agents.
 - Jack is an anxious overworked accountant. Jack dreams of becoming a battle rapper like Eminem and always looks for an opportunity to rhyme.
 
-- Every line should be formatted like this:
+- Every line of text you write should be formatted like this:
 CHARACTER ${this.chatLogDivider} LINE OF DIALOG
 
 - Every line of dialog should end with a newline.
 - Every line of the script should be dialog between the characters: Goopsea, Jack, and Woadie.
-- Keep the episode interesting, engaging, and most importantly: humorous.
-- Use common TV troupes and movie plots to keep the story moving along.`;
+- Don't repeat the initial user prompt or state your reasoning.
+`;
+// - Keep the episode interesting, engaging, and make sure to progress the story.
+// - The current time is ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.
     // https://en.wikipedia.org/wiki/The_Thirty-Six_Dramatic_Situations
     this.modifiers = shuffle([
-      "Continue the script and focus on the initial topic.",
+      // "Continue the script and focus on the initial topic.",
       "Continue the script and make the characters experience or achieve something amazing.",
       // "Continue the script and make the characters experience a downfall and have an unhappy ending.",
       // "Continue the script and have one of the characters fail.",
@@ -183,28 +185,27 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
       }
 
       var generateCount = 5;
-      // var modifierIndex = getRandomInt(this.modifiers.length);
-      // while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
-      // this.prevModifierIndex = modifierIndex;
+      var modifierIndex = getRandomInt(this.modifiers.length);
+      while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
+      this.prevModifierIndex = modifierIndex;
       //var prevRemainingTokens = 0;
       for(var i=0; i<generateCount; ++i) {
         const isEndOfEpisode = i == generateCount-1;
         if (isEndOfEpisode) {
-          messages.push({role: "system", content: "Wrap up the episode in a satisfying way." });
+          messages.push({role: "user", content: "Wrap up the episode in a satisfying way." });
         }
         else if (i > 0) {
-          // var midPrompt = this.modifiers[modifierIndex];
-          // console.re.log(`generator:modify> ${midPrompt.toUpperCase()}`);
-
+          var midPrompt = this.modifiers[modifierIndex];
+          console.re.log(`generator:modify> ${midPrompt.toUpperCase()}`);
           // openai
-          // messages.push({role: "system", content: midPrompt });
-
-          // gooseai
-          // messages.push(`[${midPrompt}]`);
+          messages.push({role: "system", content: midPrompt });
+          // // gooseai
+          // // messages.push(`[${midPrompt}]`);
+          // messages.push({role: "user", content: `Continue the episode, this is act ${i+1} of ${generateCount}.` });
         }
 
         // openai
-        const maxTokens = isEndOfEpisode ? 300 : 200; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
+        const maxTokens = isEndOfEpisode ? 1000 : 300; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
 
         // gooseai
         // const maxTokens = 500; // gooseai
@@ -262,7 +263,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
       }
 
       // openai
-      rawTxtStory = storyMessages
+      rawTxtStory = currentUserPrompt.prompt + "\n" + storyMessages
         .filter((msg) => msg.role === "assistant")
         .map((msg) => msg.content)
         .join("\n");
