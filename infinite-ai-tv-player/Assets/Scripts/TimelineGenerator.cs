@@ -1,4 +1,4 @@
-using Cinemachine;
+using Unity.Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,17 +19,17 @@ public class TimelineGenerator : MonoBehaviour
     public const int fps = 24;
 
     [Header("Cameras")]
-    public CinemachineVirtualCamera introCam;
-    public CinemachineVirtualCamera endCam;
+    public CinemachineCamera introCam;
+    public CinemachineCamera endCam;
 
-    public CinemachineVirtualCamera wideCam;
-    public CinemachineVirtualCamera superWideCam;
-    public CinemachineVirtualCamera goopseaCam;
-    public CinemachineVirtualCamera goopseaCloseCam;
-    public CinemachineVirtualCamera jackCam;
-    public CinemachineVirtualCamera jackCloseCam;
-    public CinemachineVirtualCamera woadieCam;
-    public CinemachineVirtualCamera woadieCloseCam;
+    public CinemachineCamera wideCam;
+    public CinemachineCamera superWideCam;
+    public CinemachineCamera goopseaCam;
+    public CinemachineCamera goopseaCloseCam;
+    public CinemachineCamera jackCam;
+    public CinemachineCamera jackCloseCam;
+    public CinemachineCamera woadieCam;
+    public CinemachineCamera woadieCloseCam;
 
     [Header("Characters")]
     public Character goopsea;
@@ -875,11 +875,11 @@ public class TimelineGenerator : MonoBehaviour
         woadie.transform.rotation = Quaternion.identity;
     }
 
-    private void UpdateCameraBounds(PolygonCollider2D bounds, params CinemachineVirtualCamera[] cameras)
+    private void UpdateCameraBounds(PolygonCollider2D bounds, params CinemachineCamera[] cameras)
     {
-        foreach (CinemachineVirtualCamera cam in cameras)
+        foreach (CinemachineCamera cam in cameras)
         {
-            cam.GetComponent<CinemachineConfiner2D>().m_BoundingShape2D = bounds;
+            cam.GetComponent<CinemachineConfiner2D>().BoundingShape2D = bounds;
         }
     }
 
