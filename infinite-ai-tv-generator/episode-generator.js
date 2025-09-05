@@ -184,8 +184,8 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
 
       var generateCount = 5;
       // var modifierIndex = getRandomInt(this.modifiers.length);
-      while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
-      this.prevModifierIndex = modifierIndex;
+      // while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
+      // this.prevModifierIndex = modifierIndex;
       //var prevRemainingTokens = 0;
       for(var i=0; i<generateCount; ++i) {
         const isEndOfEpisode = i == generateCount-1;
