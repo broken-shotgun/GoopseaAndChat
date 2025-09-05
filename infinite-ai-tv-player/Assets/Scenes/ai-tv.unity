@@ -4421,7 +4421,7 @@ MonoBehaviour:
   pauseText: {fileID: 1835427793}
   creditsText: {fileID: 465056888}
   speakSignal: {fileID: 11400000, guid: d277b590057599140afb2616243b4f09, type: 2}
-  speakSignalEmitter: {fileID: 2551162}
+  speakMessageSignalReceiver: {fileID: 2551176}
 --- !u!4 &1803962775
 Transform:
   m_ObjectHideFlags: 0
