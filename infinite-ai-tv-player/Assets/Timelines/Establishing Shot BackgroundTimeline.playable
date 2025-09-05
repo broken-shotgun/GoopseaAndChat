@@ -1,5 +1,23 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-5387172407086169929
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98b93040b2dfcef4cae0213398906cd1, type: 3}
+  m_Name: Speak Message Signal Emitter
+  m_EditorClassIdentifier: 
+  m_Time: 0.26666666666666666
+  m_Retroactive: 1
+  m_EmitOnce: 1
+  m_Asset: {fileID: 11400000, guid: d277b590057599140afb2616243b4f09, type: 2}
+  message: FARTS FARTS FARTS
+  voice: Microsoft
 --- !u!114 &-4064628346059801613
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -188,6 +206,7 @@ MonoBehaviour:
     m_DisplayName: CM House Ext Cam
   m_Markers:
     m_Objects: []
+  TrackPriority: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,12 +224,37 @@ MonoBehaviour:
   - {fileID: -1941826840390861213}
   - {fileID: -4064628346059801613}
   - {fileID: 8410058809633740404}
+  - {fileID: 2869991027165810392}
   m_FixedDuration: 0
   m_EditorSettings:
     m_Framerate: 60
     m_ScenePreview: 1
   m_DurationMode: 0
   m_MarkerTrack: {fileID: 0}
+--- !u!114 &2869991027165810392
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b46e36075dd1c124a8422c228e75e1fb, type: 3}
+  m_Name: Signal Track
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips: []
+  m_Markers:
+    m_Objects:
+    - {fileID: -5387172407086169929}
 --- !u!74 &8120011173651418394
 AnimationClip:
   m_ObjectHideFlags: 0

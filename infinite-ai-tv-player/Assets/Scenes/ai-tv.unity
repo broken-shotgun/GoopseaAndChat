@@ -217,6 +217,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72806d7788af49e4eb57989f23e3feeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2551176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2551162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e5b78da3fb873b4da4b0aed60dbdba2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  signalAssetEventPairs:
+  - signalAsset: {fileID: 11400000, guid: d277b590057599140afb2616243b4f09, type: 2}
+    events:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2551169}
+          m_TargetAssemblyTypeName: SpeakerBotWsClient, Assembly-CSharp
+          m_MethodName: SpeakEvent
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 1
 --- !u!1 &28303400
 GameObject:
   m_ObjectHideFlags: 0
@@ -2135,6 +2164,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 132536, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2551169}
+    - targetCorrespondingSourceObject: {fileID: 132536, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2551176}
   m_SourcePrefab: {fileID: 100100000, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
 --- !u!1 &795736161
 GameObject:
@@ -4132,10 +4164,10 @@ PlayableDirector:
   - key: {fileID: 8410058809633740404, guid: 7c509e4046a7789428940d5407b0c304, type: 2}
     value: {fileID: 1376666919}
   - key: {fileID: -4064628346059801613, guid: 7c509e4046a7789428940d5407b0c304, type: 2}
-    value: {fileID: 0}
+    value: {fileID: 1803962776}
   m_ExposedReferences:
     m_References:
-    - e6f0e4a6d61192d47ad9a6d51bcd7cf2: {fileID: 0}
+    - e6f0e4a6d61192d47ad9a6d51bcd7cf2: {fileID: 1376666921}
 --- !u!1 &1702277228
 GameObject:
   m_ObjectHideFlags: 0
@@ -4363,7 +4395,7 @@ MonoBehaviour:
   introCam: {fileID: 953611435}
   endCam: {fileID: 836419387}
   wideCam: {fileID: 1238030091}
-  superWideCam: {fileID: 1376666921}
+  superWideCam: {fileID: 0}
   goopseaCam: {fileID: 1638387332}
   goopseaCloseCam: {fileID: 1804960602}
   jackCam: {fileID: 1409216525}
@@ -4388,7 +4420,7 @@ MonoBehaviour:
   episodeName: {fileID: 269456461}
   pauseText: {fileID: 1835427793}
   creditsText: {fileID: 465056888}
-  isAdventure: 0
+  speakSignal: {fileID: 11400000, guid: d277b590057599140afb2616243b4f09, type: 2}
 --- !u!4 &1803962775
 Transform:
   m_ObjectHideFlags: 0

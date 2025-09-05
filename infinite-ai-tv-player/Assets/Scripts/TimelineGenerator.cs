@@ -59,8 +59,12 @@ public class TimelineGenerator : MonoBehaviour
     public TextMeshProUGUI pauseText;
     public TextMeshProUGUI creditsText;
 
-    [Header("Goops & Goblins")]
-    public bool isAdventure;
+    //[Header("Goops & Goblins")]
+    //public bool isAdventure;
+    bool isAdventure = false;
+
+    [Header("Signals")]
+    public SignalAsset speakSignal;
 
     private bool isQueuePlaying = false;
     private EpisodeQueue episodeQueue = new EpisodeQueue();
@@ -83,7 +87,7 @@ public class TimelineGenerator : MonoBehaviour
         director.played += (aDirector) =>
         {
             isEpisodeFinished = false;
-            StartCoroutine(StartTwitchPoll(currentUser));
+            //StartCoroutine(StartTwitchPoll(currentUser));
         };
         director.stopped += (aDirector) =>
         {
@@ -435,6 +439,7 @@ public class TimelineGenerator : MonoBehaviour
         AddIdleAnimationClip(woadieAnimationTrack, woadie, 0);
 
         var controlTrack = timelineAsset.CreateTrack<ControlTrack>();
+        var signalTrack = timelineAsset.CreateTrack<SignalTrack>();
 
         var startTime = 0.0;
         TimelineClip currentCameraClip = null;
@@ -473,7 +478,7 @@ public class TimelineGenerator : MonoBehaviour
                 {
                     //var dialogAudioClip = GetAudioClipFromBase64Wav(direction);
                     var dialogAudioClip = await GetAudioClipFromBase64Mp3(direction);
-                    if (dialogAudioClip != null) 
+                    if (dialogAudioClip != null)
                     {
                         var audioTimelineClip = mainAudioTrack.CreateClip(dialogAudioClip);
                         audioTimelineClip.start = startTime;
@@ -493,14 +498,35 @@ public class TimelineGenerator : MonoBehaviour
                             AddTalkingAnimationClip(woadieAnimationTrack, woadie, startTime, audioTimelineClip.duration);
                         }
                     }
-                    else
+                }
+                else
+                {
+                    //Debug.LogWarning("CreateTimeline> dialog audio clip is null");
+                    duration = 3f;
+
+                    // TODO any way to have timeline event trigger call to speak method?
+
+                    Character activeCharacter = null;
+                    if (direction.target == "goopsea")
                     {
-                        Debug.LogWarning("CreateTimeline> dialog audio clip is null");
-                        duration = 3f;
+                        activeCharacter = goopsea;
+                        AddTalkingAnimationClip(goopseaAnimationTrack, goopsea, startTime, duration);
+                    }
+                    else if (direction.target == "jack")
+                    {
+                        activeCharacter = jack;
+                        AddTalkingAnimationClip(jackAnimationTrack, jack, startTime, duration);
+                    }
+                    else if (direction.target == "woadie")
+                    {
+                        activeCharacter = woadie;
+                        AddTalkingAnimationClip(woadieAnimationTrack, woadie, startTime, duration);
                     }
 
-                    AddSubtitleClip(subtitleTrack, direction.target.ToUpper() + ": " + direction.text, startTime, duration, true);
+                    AddSpeakMessageSignalClip(signalTrack, activeCharacter, startTime, direction.text);
                 }
+
+                AddSubtitleClip(subtitleTrack, direction.target.ToUpper() + ": " + direction.text, startTime, duration, true);
 
                 if (currentCameraClip != null) currentCameraClip.duration += duration;
 
@@ -578,6 +604,15 @@ public class TimelineGenerator : MonoBehaviour
         talkTimelineClip.duration = talkDuration;
 
         AddIdleAnimationClip(characterTrack, character, talkTimelineClip.start + talkTimelineClip.duration);
+    }
+
+    private void AddSpeakMessageSignalClip(SignalTrack signalTrack, Character character, double start, string message)
+    {
+        var speakMarker = signalTrack.CreateMarker<SpeakMessageSignalEmitter>(start);
+        speakMarker.message = message;
+        speakMarker.voice = "Microsoft"; // TODO switch based on character
+        speakMarker.retroactive = true;
+        speakMarker.asset = speakSignal;
     }
 
     private void AddIdleAnimationClip(AnimationTrack characterTrack, Character character, double start)

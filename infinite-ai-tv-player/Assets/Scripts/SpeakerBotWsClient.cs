@@ -32,14 +32,36 @@ public class SpeakerBotWsClient : MonoBehaviour
         public bool badWordFilter { get; set; }
     }
 
-    void Speak(string message)
+    public void Speak(string message)
     {
         var wsRequest = new SpeakRequest
         {
             id = "1",
             request = "Speak",
-            voice = "Microsoft",
+            voice = "Microsoft-David",
             message = message,
+            badWordFilter = true
+        };
+        string json = JsonConvert.SerializeObject(wsRequest);
+        Debug.Log(json);
+        ws.Send(json);
+    }
+
+    public class SpeakEventParams
+    {
+        public string voice { get; set; }
+        public string message { get; set; }
+    }
+
+    public void SpeakEvent(SpeakEventParams speakEvent)
+    {
+        Debug.Log($"Speak event {speakEvent} triggered!");
+        var wsRequest = new SpeakRequest
+        {
+            id = "1",
+            request = "Speak",
+            voice = speakEvent.voice,
+            message = speakEvent.message,
             badWordFilter = true
         };
         string json = JsonConvert.SerializeObject(wsRequest);
