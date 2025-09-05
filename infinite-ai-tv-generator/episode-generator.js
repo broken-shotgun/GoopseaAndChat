@@ -28,11 +28,11 @@ module.exports = class EpisodeGenerator {
     this.lineRegex = new RegExp(`^([^\n\r${this.chatLogDivider}]*)${this.chatLogDivider} (.+)$`, "i");
     this.prevModifierIndex = -1
     this.setupPrompt = `
-You are a seasoned comedy writer for Adult Swim with a penchant for the weird and unsual.
-You are writing a script for an episode of a funny cartoon between the following characters: Goopsea, Jack, and Woadie.
+You are a seasoned comedy TV show writer that specializes in short (1-3 minute) animations.
+You are writing a script for an episode of a cartoon between the following characters: Goopsea, Jack, and Woadie.
 
-- Goopsea is a depressed cynical overweight cat.  Goopsea LOVES food.
-- Woadie is a wildly curious frog dog that questions everything, even the blatantly obvious.
+- Goopsea is a holly jolly overweight cat.  Goopsea LOVES food, especially canolis.
+- Woadie is a former army trained frog dog.  Woadie talks like the drill seargent from Full Metal Jacket.
 - Jack is an anxious overworked accountant. Jack dreams of becoming a battle rapper like Eminem and always looks for an opportunity to rhyme.
 
 - Every line should be formatted like this:
@@ -40,7 +40,8 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
 
 - Every line of dialog should end with a newline.
 - Every line of the script should be dialog between the characters: Goopsea, Jack, and Woadie.
-- Keep the episode interesting, engaging, and most importantly: humorous.`;
+- Keep the episode interesting, engaging, and most importantly: humorous.
+- Use common TV troupes and movie plots to keep the story moving along.`;
     // https://en.wikipedia.org/wiki/The_Thirty-Six_Dramatic_Situations
     this.modifiers = shuffle([
       "Continue the script and focus on the initial topic.",
@@ -181,8 +182,8 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         // messages.push(currentUserPrompt.prompt);
       }
 
-      var generateCount = 3;
-      var modifierIndex = getRandomInt(this.modifiers.length);
+      var generateCount = 5;
+      // var modifierIndex = getRandomInt(this.modifiers.length);
       while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
       this.prevModifierIndex = modifierIndex;
       //var prevRemainingTokens = 0;
@@ -192,18 +193,18 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
           messages.push({role: "system", content: "Wrap up the episode in a satisfying way." });
         }
         else if (i > 0) {
-          var midPrompt = this.modifiers[modifierIndex];
-          console.re.log(`generator:modify> ${midPrompt.toUpperCase()}`);
+          // var midPrompt = this.modifiers[modifierIndex];
+          // console.re.log(`generator:modify> ${midPrompt.toUpperCase()}`);
 
           // openai
-          messages.push({role: "system", content: midPrompt });
+          // messages.push({role: "system", content: midPrompt });
 
           // gooseai
           // messages.push(`[${midPrompt}]`);
         }
 
         // openai
-        const maxTokens = isEndOfEpisode ? 500 : 200; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
+        const maxTokens = isEndOfEpisode ? 300 : 200; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
 
         // gooseai
         // const maxTokens = 500; // gooseai
