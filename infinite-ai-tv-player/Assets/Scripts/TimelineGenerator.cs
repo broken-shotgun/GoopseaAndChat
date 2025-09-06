@@ -609,11 +609,23 @@ public class TimelineGenerator : MonoBehaviour
         AddIdleAnimationClip(characterTrack, character, talkTimelineClip.start + talkTimelineClip.duration);
     }
 
+    private string GetSpeakerBotVoiceAlias(string name)
+    {
+        switch (name.ToUpper())
+        {
+            case "GOOPSEA": return "Goopsea";
+            case "WOADIE": return "Woadie";
+            case "JACK": return "Jack";
+        }
+
+        return "Microsoft"; // default to use free tts
+    }
+
     private void AddSpeakMessageSignalClip(SignalTrack signalTrack, Character character, double start, string message)
     {
         var speakMarker = signalTrack.CreateMarker<SpeakMessageSignalEmitter>(start);
         speakMarker.message = SecurityElement.Escape(message);  // xml escape tts text
-        speakMarker.voice = "Microsoft"; // TODO switch based on character
+        speakMarker.voice = GetSpeakerBotVoiceAlias(character.name);
         speakMarker.asset = speakSignal;
     }
 
