@@ -506,7 +506,7 @@ public class TimelineGenerator : MonoBehaviour
                 {
                     //Debug.LogWarning("CreateTimeline> dialog audio clip is null");
                     var wordCount = direction.text.Split(' ').Length;
-                    duration = wordCount * (60.0 / 140.0); // words times average words per minute rate
+                    duration = (wordCount * (60.0 / 140.0)) + 1.5f; // words times average words per minute rate (plus extra 1.5 seconds to generate)
                     Debug.Log($"{wordCount} Words ~{duration} seconds");
 
                     Character activeCharacter = null;
