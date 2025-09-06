@@ -625,7 +625,7 @@ public class TimelineGenerator : MonoBehaviour
     {
         var speakMarker = signalTrack.CreateMarker<SpeakMessageSignalEmitter>(start);
         speakMarker.message = SecurityElement.Escape(message);  // xml escape tts text
-        speakMarker.voice = GetSpeakerBotVoiceAlias(character.name);
+        speakMarker.voice = GetSpeakerBotVoiceAlias(character != null ? character.name : "default");
         speakMarker.asset = speakSignal;
     }
 

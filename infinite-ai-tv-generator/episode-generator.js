@@ -28,12 +28,7 @@ module.exports = class EpisodeGenerator {
     this.lineRegex = new RegExp(`^([^\n\r${this.chatLogDivider}]*)${this.chatLogDivider} (.+)$`, "i");
     this.prevModifierIndex = -1
     this.setupPrompt = `
-You are a seasoned cartoon show writer.
 You are writing a script for an episode between the following characters: Goopsea, Jack, and Woadie.
-
-- Goopsea is a depressed wisecracking overweight cat.  Goopsea LOVES food.
-- Woadie is a super intelligent frog dog.  He acts like Urkel from Family Matters.  Woadie was a secret government experiment that escaped and so he is always hiding from government agents.
-- Jack is an anxious overworked accountant. Jack dreams of becoming a battle rapper like Eminem and always looks for an opportunity to rhyme.
 
 - Every line of text you write should be formatted like this:
 CHARACTER ${this.chatLogDivider} LINE OF DIALOG
@@ -42,6 +37,10 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
 - Every line of the script should be dialog between the characters: Goopsea, Jack, and Woadie.
 - Don't repeat the initial user prompt or state your reasoning.
 `;
+// You are a seasoned cartoon show writer.
+// - Goopsea is a depressed wisecracking overweight cat.  Goopsea LOVES food.
+// - Woadie is a super intelligent frog dog.  He acts like Urkel from Family Matters.  Woadie was a secret government experiment that escaped and so he is always hiding from government agents.
+// - Jack is an anxious overworked accountant. Jack dreams of becoming a battle rapper like Eminem and always looks for an opportunity to rhyme.
 // - Keep the episode interesting, engaging, and make sure to progress the story.
 // - The current time is ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.
     // https://en.wikipedia.org/wiki/The_Thirty-Six_Dramatic_Situations
@@ -205,7 +204,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         }
 
         // openai
-        const maxTokens = isEndOfEpisode ? 1000 : 300; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
+        const maxTokens = isEndOfEpisode ? 500 : 200; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
 
         // gooseai
         // const maxTokens = 500; // gooseai
@@ -493,9 +492,8 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         target: cameraTarget,
       });
 
-      // var base64Audio = "";
-      //*
       var base64Audio;
+      /*
       if (!skiptts) {
         try {
           // Google TTS
