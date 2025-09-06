@@ -184,7 +184,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         // messages.push(currentUserPrompt.prompt);
       }
 
-      var generateCount = 5;
+      var generateCount = 3;
       var modifierIndex = getRandomInt(this.modifiers.length);
       while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
       this.prevModifierIndex = modifierIndex;

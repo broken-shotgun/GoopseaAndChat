@@ -1,16 +1,17 @@
-using Unity.Cinemachine;
+using IngameDebugConsole;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Timeline;
-using TMPro;
-using UnityEngine.Networking;
-using IngameDebugConsole;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
+using Unity.Cinemachine;
+using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
 public class TimelineGenerator : MonoBehaviour
 {
@@ -504,9 +505,9 @@ public class TimelineGenerator : MonoBehaviour
                 else
                 {
                     //Debug.LogWarning("CreateTimeline> dialog audio clip is null");
-                    duration = 3f;
-
-                    // TODO any way to have timeline event trigger call to speak method?
+                    var wordCount = direction.text.Split(' ').Length;
+                    duration = wordCount * (60.0 / 140.0); // words times average words per minute rate
+                    Debug.Log($"{wordCount} Words ~{duration} seconds");
 
                     Character activeCharacter = null;
                     if (direction.target == "goopsea")
@@ -611,7 +612,7 @@ public class TimelineGenerator : MonoBehaviour
     private void AddSpeakMessageSignalClip(SignalTrack signalTrack, Character character, double start, string message)
     {
         var speakMarker = signalTrack.CreateMarker<SpeakMessageSignalEmitter>(start);
-        speakMarker.message = message;
+        speakMarker.message = SecurityElement.Escape(message);  // xml escape tts text
         speakMarker.voice = "Microsoft"; // TODO switch based on character
         speakMarker.asset = speakSignal;
     }
