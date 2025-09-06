@@ -183,13 +183,13 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         // messages.push(currentUserPrompt.prompt);
       }
 
-      var generateCount = 3;
+      var generateCount = 1; // TODO add this as a parameter to submit prompt form
       var modifierIndex = getRandomInt(this.modifiers.length);
       while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
       this.prevModifierIndex = modifierIndex;
       //var prevRemainingTokens = 0;
       for(var i=0; i<generateCount; ++i) {
-        const isEndOfEpisode = i == generateCount-1;
+        const isEndOfEpisode = i > 0 && i == generateCount-1;
         if (isEndOfEpisode) {
           messages.push({role: "user", content: "Wrap up the episode in a satisfying way." });
         }
@@ -204,7 +204,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         }
 
         // openai
-        const maxTokens = isEndOfEpisode ? 500 : 200; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
+        const maxTokens = isEndOfEpisode ? 500 : 300; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
 
         // gooseai
         // const maxTokens = 500; // gooseai
