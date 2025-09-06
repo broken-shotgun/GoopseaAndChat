@@ -264,7 +264,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
       // openai
       rawTxtStory = currentUserPrompt.prompt + "\n" + storyMessages
         .filter((msg) => msg.role === "assistant")
-        .map((msg) => msg.content)
+        .map((msg) => msg.content.replaceAll("’", "'"))
         .join("\n");
 
       // gooseai
