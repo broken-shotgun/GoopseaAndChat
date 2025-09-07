@@ -90,6 +90,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
    * @property {string} user Twitch username who submitted this prompt
    * @property {string} date timestamp for when reward was redeemed
    * @property {string} prompt formatted episode prompt
+   * @property {string} location episode location
    * @property {UserPromptOptions} options 
    */
 
@@ -204,7 +205,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         }
 
         // openai
-        const maxTokens = isEndOfEpisode ? 500 : 300; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
+        const maxTokens = isEndOfEpisode ? 1000 : 500; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
 
         // gooseai
         // const maxTokens = 500; // gooseai
@@ -277,7 +278,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         date: currentUserPrompt.date,
         user: currentUserPrompt.user,
         model: aiModel,
-        location: currentLocation,
+        location: currentUserPrompt.location ?? currentLocation,
         story: rawTxtStory,
         skiptts: currentUserPrompt.options.skiptts,
         //ai_img_background: img_b64

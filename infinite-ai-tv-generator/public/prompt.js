@@ -30,9 +30,11 @@ $(document).ready(function () {
     event.preventDefault();
     const shouldContinue = $("#continue").is(":checked");
     const shouldSkipTTS = $("#skiptts").is(":checked");
+    const location = $("#location").val();
     const userPrompt = {
       user: $("#author").val(),
       prompt: "",
+      location: location,
       skiptts: shouldSkipTTS,
     };
     userPrompt.prompt = $("#message").val();
