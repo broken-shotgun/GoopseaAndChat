@@ -51,6 +51,7 @@ public class TimelineGenerator : MonoBehaviour
     public GameObject establishingShotHouse;
 
     [Header("Music & SFX")]
+    public AudioSource mainAudioSource;
     public AudioClip introAudioClip;
     public AudioClip endAudioClip;
 
@@ -421,6 +422,7 @@ public class TimelineGenerator : MonoBehaviour
         director.SetGenericBinding(cameraTrack, brain);
 
         var mainAudioTrack = timelineAsset.CreateTrack<AudioTrack>("Main Audio");
+        director.SetGenericBinding(mainAudioTrack, mainAudioSource);
 
         var creditsTrack = timelineAsset.CreateTrack<SubtitleTrack>("Credits");
         director.SetGenericBinding(creditsTrack, creditsText);

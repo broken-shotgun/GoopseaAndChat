@@ -8,8 +8,9 @@ export class OpenAIClient {
       apiKey: "ollama" // Dummy key, not used by Ollama
     });
     //this.model = "gpt-3.5-turbo";
-    this.model = "gpt-oss:20b";
+    // this.model = "gpt-oss:20b";
     // this.model = "deepseek-r1:8b";
+    this.model = "llama3.1:8b";
     // this.model = "gpt-4-turbo";
   }
 

@@ -265,7 +265,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
       // openai
       rawTxtStory = currentUserPrompt.prompt + "\n" + storyMessages
         .filter((msg) => msg.role === "assistant")
-        .map((msg) => msg.content.replaceAll("’", "'"))
+        .map((msg) => msg.content)
         .join("\n");
 
       // gooseai
@@ -279,7 +279,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         user: currentUserPrompt.user,
         model: aiModel,
         location: currentUserPrompt.location ?? currentLocation,
-        story: rawTxtStory,
+        story: rawTxtStory.replace(/[’']/gim, ""),
         skiptts: currentUserPrompt.options.skiptts,
         //ai_img_background: img_b64
       };
