@@ -56,6 +56,11 @@ public class SpeakerBotWsClient : MonoBehaviour
     public void SpeakEvent(SpeakEventParams speakEvent)
     {
         Debug.Log($"Speak event {speakEvent} triggered!");
+        if (ws.ReadyState != WebSocketState.Open)
+        {
+            Debug.Log("Web Socket connection error: attempting to reconnect");
+            ws.Connect();
+        }
         var wsRequest = new SpeakRequest
         {
             id = "1",
