@@ -10,11 +10,12 @@ Note: originally built with Built with Unity Editor Version 2021.3.18f1.  But Un
 
 Install UnityHub and install Unity 6.2.
 
-"No valid Unity Editor license found. Please activate your license." - Stupid Unity forcing you to use UnityHub to open and launch projects, it didn't used to be like this...
+Known issues:
+"No valid Unity Editor license found. Please activate your license." - Use UnityHub to open the project, not the editor exe itself.
 
 ## infinite-ai-tv-generator (Node.js)
 
-This is a Node.js project for generating the episodes.  It will generate the episode text from a generative AI text service, then progmatically generated the episode and text-to-speech all the dialog.  When the episode is "ready", it will be placed in a folder that the Unity scene is configured to look at for new episodes.
+This is a Node.js project for generating the episodes.  It will generate the episode text from a generative AI text service, then progmatically generated the episode and text-to-speech all the dialog.  When the episode is "ready", it will be placed in a folder that the Unity scene is configured to look at for new episodes. For testing, I usually call `setEpisodesDir` in the player debug console (`~` to open debug console) and update it to `{REPLACE_WITH_FULL_PROJECT_DIRECTORY_PATH}/infinite-ai-tv-generator/episodes`.
 
 ### Setup
 
