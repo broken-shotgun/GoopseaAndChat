@@ -14,6 +14,10 @@ export class OpenAIClient {
     // this.model = "gpt-4-turbo";
   }
 
+  setCurrentModel(model) {
+    this.model = model;
+  }
+
   /**
    * Get the currently loaded AI model.
    * 

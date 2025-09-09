@@ -91,6 +91,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
    * @property {string} date timestamp for when reward was redeemed
    * @property {string} prompt formatted episode prompt
    * @property {string} location episode location
+   * @property {string} model ai model to use for this prompt
    * @property {UserPromptOptions} options 
    */
 
@@ -154,8 +155,9 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
       return;
     }
 
-    var currentUserPrompt = this.userPromptQueue.shift();
+    const currentUserPrompt = this.userPromptQueue.shift();
     const currentLocation = this.getRandomLocation();
+    this.openai.setCurrentModel(currentUserPrompt.model);
     try {
       const messages = [];
       if (this.continue) { // continue previous episode

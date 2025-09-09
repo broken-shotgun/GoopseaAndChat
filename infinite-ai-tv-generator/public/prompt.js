@@ -31,10 +31,12 @@ $(document).ready(function () {
     const shouldContinue = $("#continue").is(":checked");
     const shouldSkipTTS = $("#skiptts").is(":checked");
     const location = $("#location").val();
+    const model = $("#model").val();
     const userPrompt = {
       user: $("#author").val(),
       prompt: "",
       location: location,
+      model: model,
       skiptts: shouldSkipTTS,
     };
     userPrompt.prompt = $("#message").val();

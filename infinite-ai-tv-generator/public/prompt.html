@@ -1,29 +1,35 @@
 <html>
-  <head>
-    <title>Goopsea Prompt Submit</title>
-    <script
-      src="https://code.jquery.com/jquery-3.6.4.min.js"
-      integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
-      crossorigin="anonymous"></script>
-    <script src="prompt.js"></script>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <form id="enquiry" action="">
-      <input type="text" id="author" name="author" placeholder="Author" value="aipd">
-      <textarea maxlength="5000" name="message" id="message" placeholder="Add your prompt!"></textarea>
-      <select name="location" id="location">
-        <option value="kitchen">Kitchen</option>
-        <option value="living-room">Living Room</option>
-        <option value="italian-restaurant">Restaurant</option>
-        <option value="litter-box">Litter Box</option>
-        <option value="transmission-factory">Factory</option>
-      </select>
-      <input type="checkbox" id="continue" name="continue">
-      <label for="continue">Continue?</label>
-      <!-- <input type="checkbox" id="skiptts" name="skiptts"> -->
-      <!-- <label for="skiptts">Skip generating TTS audio?</label><br> -->
-      <input type="submit" value="Submit Prompt">
-    </form>
-  </body>
+
+<head>
+  <title>Goopsea Prompt Submit</title>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"
+    integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+  <script src="prompt.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <form id="enquiry" action="">
+    <input type="text" id="author" name="author" placeholder="Author" value="aipd">
+        <select name="model" id="model">
+      <option value="gpt-oss:20b" selected>gpt-oss:20b</option>
+      <option value="deepseek-r1:8b">deepseek-r1:8b</option>
+      <option value="llama3.1:8b" selected>llama3.1:8b</option>
+    </select>
+    <textarea maxlength="5000" name="message" id="message" placeholder="Add your prompt!"></textarea>
+    <select name="location" id="location">
+      <option value="kitchen" selected>Kitchen</option>
+      <option value="living-room">Living Room</option>
+      <option value="italian-restaurant">Restaurant</option>
+      <option value="litter-box">Litter Box</option>
+      <option value="transmission-factory">Factory</option>
+    </select>
+    <input type="checkbox" id="continue" name="continue">
+    <label for="continue">Continue?</label>
+    <!-- <input type="checkbox" id="skiptts" name="skiptts"> -->
+    <!-- <label for="skiptts">Skip generating TTS audio?</label><br> -->
+    <input type="submit" value="Submit Prompt">
+  </form>
+</body>
+
 </html>

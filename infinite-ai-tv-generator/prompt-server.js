@@ -128,6 +128,7 @@ app.post("/addPromptManual", (req, res) => {
   const user = req.body.user;
   const prompt = req.body.prompt;
   const location = req.body.location;
+  const model = req.body.model;
   const skiptts = req.body.skiptts;
 
   const userPrompt = {
@@ -135,6 +136,7 @@ app.post("/addPromptManual", (req, res) => {
     date: new Date(Date.now()).toISOString(),
     prompt,
     location,
+    model,
     options: {
       skiptts,
     }
@@ -162,6 +164,7 @@ app.post("/continue", (req, res) => {
   const user = req.body.user;
   const prompt = req.body.prompt;
   const location = req.body.location;
+    const model = req.body.model;
   const skiptts = req.body.skiptts;
 
   generator.markContinue();
@@ -170,6 +173,7 @@ app.post("/continue", (req, res) => {
     date: new Date(Date.now()).toISOString(),
     prompt,
     location,
+    model,
     options: {
       skiptts,
     }
