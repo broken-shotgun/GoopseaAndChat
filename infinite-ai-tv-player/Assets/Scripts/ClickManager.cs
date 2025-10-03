@@ -8,6 +8,7 @@ using UnityEngine;
 public class ClickManager : MonoBehaviour
 {
     public Vector3 mousePosition;
+    public ContactFilter2D contactFilter;
     public Collider2D[] overlapResults = new Collider2D[5];
     public GameObject selectedObject;
     public GameObject party;
@@ -23,7 +24,7 @@ public class ClickManager : MonoBehaviour
         }
         else if (Input.GetMouseButtonDown(0) && selectedObject == null)
         {
-            int hitCount = Physics2D.OverlapPointNonAlloc(mousePosition, overlapResults);
+            int hitCount = Physics2D.OverlapPoint(mousePosition, contactFilter, overlapResults);
             Collider2D highestCollider = GetHighestObject(overlapResults, hitCount);
             if (highestCollider != null)
             {
