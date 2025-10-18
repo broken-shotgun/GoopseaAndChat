@@ -17,7 +17,7 @@
     "express": "^4.21.2",
     "libsodium-wrappers": "^0.7.15",
     "node-fetch": "^2.7.0",
-    "openai": "^4.82.0",
+    "openai": "^6.5.0",
     "sqlite3": "^5.1.7",
     "sse-express": "^2.0.2",
     "tmi.js": "^1.8.5"
