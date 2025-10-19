@@ -1,14 +1,5 @@
 require('dotenv').config()
 
-const consolere = require("console-remote-client");
-consolere.connect({
-  // server: 'https://console.re', // optional, default: https://console.re
-  channel: process.env.CONSOLERE_CHANNEL, // required
-  // redirectDefaultConsoleToRemote: true, // optional, default: false
-  // disableDefaultConsoleOutput: true, // optional, default: false
-});
-console.re.log(`https://console.re/${process.env.CONSOLERE_CHANNEL}`);
-
 const sseExpress = require('sse-express');
 
 const EpisodeGenerator = require("./episode-generator");
@@ -41,12 +32,12 @@ db.serialize(() => {
     db.run(
       "CREATE TABLE Scores (user TEXT PRIMARY KEY, score INT DEFAULT 0)"
     );
-    console.re.log("New table Scores created!");
+    console.log("New table Scores created!");
   } else {
-    console.re.log('Database "Scores" ready to go!');
+    console.log('Database "Scores" ready to go!');
     // db.each("SELECT * from Scores ORDER BY score DESC LIMIT 25", (err, row) => {
     //   if (row) {
-    //     console.re.log(`${row.user} ${row.score}`);
+    //     console.log(`${row.user} ${row.score}`);
     //   }
     // });
   }
@@ -65,9 +56,9 @@ function updateUserScore(user, score) {
     user, score, 
     error => {
       if (error) {
-        console.re.error(`Error updating score for ${user}: ${error}`);
+        console.error(`Error updating score for ${user}: ${error}`);
       } else {
-        console.re.log(`Success!  Updated score for ${user} to ${score}`);
+        console.log(`Success!  Updated score for ${user} to ${score}`);
       }
     }
   );
@@ -83,9 +74,9 @@ function getUserScore(user, callback) {
   db.all(`SELECT score from Scores WHERE user='${user}' LIMIT 1`, (err, rows) => {
     var score = 0;
     if (err) {
-      console.re.error(`Error getting score for ${user}: ${error}`);
+      console.error(`Error getting score for ${user}: ${error}`);
     } else if (rows && rows.length > 0) {
-      console.re.log(`Score for ${user}: ${rows[0].score}`);
+      console.log(`Score for ${user}: ${rows[0].score}`);
       score = rows[0].score;
     }
     if (callback) callback(score);
@@ -97,7 +88,7 @@ function getUserScore(user, callback) {
  */
 
 app.get("/addPrompt", (req, res) => {
-  console.re.log(`addPrompt:headers = ${JSON.stringify(req.headers)}`);
+  console.log(`addPrompt:headers = ${JSON.stringify(req.headers)}`);
 
   const user = req.headers['x-twitch-user'];
   const prompt = decodeURIComponent(req.headers['x-prompt'])
@@ -105,13 +96,13 @@ app.get("/addPrompt", (req, res) => {
     .substring(0, 500); // fix for unlimited length prompts on Twitch mobile
 
   if (user != "aipd" && userSet.has(user)) {
-    console.re.warn(`Error: ${user} already has a prompt pending.`);
+    console.warn(`Error: ${user} already has a prompt pending.`);
     res.status(200).send("ERROR_USER_PROMPT_PENDING");
     return;
   }
 
   userSet.add(user);
-  console.re.log(`${user} submitted prompt = ${prompt}`);
+  console.log(`${user} submitted prompt = ${prompt}`);
 
   const formattedPrompt = formatShortPrompt(prompt);
   const userPrompt = {
@@ -143,16 +134,16 @@ app.post("/addPromptManual", (req, res) => {
   };
 
   if (user == "aipd") {
-    console.re.log(`ADMIN ${user} submitted prompt = ${prompt}`);
+    console.log(`ADMIN ${user} submitted prompt = ${prompt}`);
     generator.addPrompt(userPrompt);
     promptCount++;
   } else {
     if (userSet.has(user)) {
-      console.re.warn(`Error: ${user} already has a prompt pending.`);
+      console.warn(`Error: ${user} already has a prompt pending.`);
       res.status(200).send("ERROR_USER_PROMPT_PENDING");
       return;
     }
-    console.re.log(`${user} submitted prompt = ${prompt}`);
+    console.log(`${user} submitted prompt = ${prompt}`);
     userSet.add(user);
     userPrompMap.set(user, userPrompt);
   }
@@ -185,7 +176,7 @@ app.post("/continue", (req, res) => {
 
 app.post("/markPlayed", (req, res) => {
   const user = req.query.user;
-  console.re.log(`${user} episode marked as played.`);
+  console.log(`${user} episode marked as played.`);
   userSet.delete(user);
   res.status(200).send({});
 });
@@ -194,8 +185,8 @@ app.post("/addStory", (req, res) => {
   const rawStory = req.body;
   rawStory.location = "";
   // rawStory.ai_img_background = "";
-  console.re.log(`${rawStory.user}'s story manually approved and added to processing queue.`);
-  // console.re.log(rawStory);
+  console.log(`${rawStory.user}'s story manually approved and added to processing queue.`);
+  // console.log(rawStory);
   generator.addRawEpisode(rawStory);
   res.status(200).send({});
 });
@@ -206,7 +197,7 @@ app.get("/queue", (req, res) => {
 });
 
 app.get("/getUserScore", (req, res) => {
-  console.re.log(`getUserScore:headers = ${JSON.stringify(req.headers)}`);
+  console.log(`getUserScore:headers = ${JSON.stringify(req.headers)}`);
   const user = req.headers['x-twitch-user'].trim().toLowerCase();
   getUserScore(user, (currentScore) => {
     res.status(200).send(`${currentScore}`);
@@ -214,7 +205,7 @@ app.get("/getUserScore", (req, res) => {
 });
 
 app.get("/saveUserScore", (req, res) => {
-  console.re.log(`saveUserScore:headers = ${JSON.stringify(req.headers)}`);
+  console.log(`saveUserScore:headers = ${JSON.stringify(req.headers)}`);
   const user = req.headers['x-twitch-user'].trim().toLowerCase();
   const newScore = parseInt(req.headers['x-score']);
   getUserScore(user, (currentScore) => {
@@ -230,7 +221,7 @@ app.get("/moderation/events", sseExpress(), (request, response) => {
   //   return;
   // }
   
-  console.re.log("aitv> event source client opened");
+  console.log("aitv> event source client opened");
 
   const intervalId = setInterval(() => {
     const eventData = {
@@ -244,7 +235,7 @@ app.get("/moderation/events", sseExpress(), (request, response) => {
   }, 200);
   
   response.on('close', () => {
-    console.re.log("aitv> event source client closed");
+    console.log("aitv> event source client closed");
     clearInterval(intervalId);
   });
 });
@@ -263,7 +254,7 @@ app.get("/moderation/approve", (req, res) => {
     userPrompMap.delete(user);
     promptCount++;
   } else {
-    console.re.warn(`moderation:approve> ${user} has pending prompt`)
+    console.warn(`moderation:approve> ${user} has pending prompt`)
   }
   res.status(200).send({});
 });
@@ -289,7 +280,7 @@ app.get("/moderation/deny", (req, res) => {
 function start() {
   generator.start();
   const listener = app.listen(process.env.PORT, () => {
-    console.re.log("Your app is listening on port " + listener.address().port);
+    console.log("Your app is listening on port " + listener.address().port);
   });
 }
 

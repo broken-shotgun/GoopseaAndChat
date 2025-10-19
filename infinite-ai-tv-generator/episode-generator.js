@@ -126,10 +126,10 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
    * @param {Function} callback called when writeFile is completed
    */
   saveStoryTextLocal(storyName, rawTxtStory, callback = () => {}) {
-    console.re.log("saving current story...");
+    console.log("saving current story...");
     fs.writeFile(`episodes/raw/${storyName}.txt`, rawTxtStory, "utf-8", (err) => {
-      if (err) console.re.error(err);
-      else console.re.log(`Success!  Story saved to: episodes/raw/${storyName}.txt`);
+      if (err) console.error(err);
+      else console.log(`Success!  Story saved to: episodes/raw/${storyName}.txt`);
       if (callback) callback();
     });
   }
@@ -170,10 +170,10 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         // gooseai
         // messages.push(currentUserPrompt.prompt);
 
-        console.re.log(`continuing previous episode, current episode arc = ${this.continueCount + 1} episodes`);
+        console.log(`continuing previous episode, current episode arc = ${this.continueCount + 1} episodes`);
       }
       else { // new episode
-        console.re.log(`starting new episode`);
+        console.log(`starting new episode`);
         this.continueCount = 0;
         this.currentMessages = [];
 
@@ -198,7 +198,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         }
         else if (i > 0) {
           var midPrompt = this.modifiers[modifierIndex];
-          console.re.log(`generator:modify> ${midPrompt.toUpperCase()}`);
+          console.log(`generator:modify> ${midPrompt.toUpperCase()}`);
           // openai
           messages.push({role: "system", content: midPrompt });
           // // gooseai
@@ -214,7 +214,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
 
         let response;
         try {
-          console.re.log(`generator:tokens> [${i}] generating with max tokens = ${maxTokens}`);
+          console.log(`generator:tokens> [${i}] generating with max tokens = ${maxTokens}`);
 
           // openai
           response = await this.openai.generateChat(messages, { max_tokens: maxTokens });
@@ -222,21 +222,21 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
           // gooseai
           // response = await this.gooseai.generate(messages, { min_tokens: maxTokens / 2, max_tokens: maxTokens });
         } catch(generateErr) {
-          console.re.error(generateErr);
+          console.error(generateErr);
           continue;
         }
         if (!response) {
-          console.re.warn(`generator:generate> null generate response, skipping...`);
+          console.warn(`generator:generate> null generate response, skipping...`);
           continue;
         }
 
-        console.re.log(`generator:generate> ${JSON.stringify(response)}`);
+        console.log(`generator:generate> ${JSON.stringify(response)}`);
   
         // openai
         if (response.choices.length > 0){
         // gooseai
         // if (response) {
-          console.re.log(`generator:generate> ${response.choices[0].message.content}`);
+          console.log(`generator:generate> ${response.choices[0].message.content}`);
           messages.push(response.choices[0].message);
           //prevRemainingTokens = maxTokens - response.usage.completion_tokens;
           //if (prevRemainingTokens < 0) prevRemainingTokens = 0;
@@ -245,9 +245,9 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
           // messages.push(response);
           // prevRemainingTokens = 0;
 
-         // console.re.log(`generator:generate> LEFTOVER TOKENS = ${prevRemainingTokens}`);
+         // console.log(`generator:generate> LEFTOVER TOKENS = ${prevRemainingTokens}`);
         } else {
-          console.re.warn(`generator:generate> no responses data and/or choices`);
+          console.warn(`generator:generate> no responses data and/or choices`);
         }
       }
   
@@ -261,7 +261,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
       } else {
         episodeName = `episode-${currentUserPrompt.date.replaceAll(":", "-")}-${this.episodeNumber.toString().padStart(3, '0')}-${service}-${currentUserPrompt.user}`;
         storyMessages = messages;
-        console.re.log(`generator:messages>`, JSON.stringify(messages));
+        console.log(`generator:messages>`, JSON.stringify(messages));
       }
 
       // openai
@@ -294,8 +294,8 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
       this.continue = false;
       this.currentMessages = messages; // messages.splice(this.currentMessages.length); // if the cost is outrageous, only store last episode into memory
     } catch (err) {
-      console.re.warn(`runGeneratorV3> Error generating prompt for ${currentUserPrompt.user}`);
-      console.re.error(err);
+      console.warn(`runGeneratorV3> Error generating prompt for ${currentUserPrompt.user}`);
+      console.error(err);
     }
 
     setTimeout(this.runGeneratorV3.bind(this), 100);
@@ -450,7 +450,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
       .map(x => x.trim());
 
     for (const line of formattedLines) {
-      // console.re.log(`$$$ ${line}`);
+      // console.log(`$$$ ${line}`);
       if (line === "") continue;
 
       const match = line.match(this.lineRegex);
@@ -518,7 +518,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
               : actor === "narrator" ? await this.tts.textToSpeech(chunk, "cjVigY5qzO86Huf0OWal") // Eric
               : await this.tts.textToSpeech(chunk, this.tts.getVoice(actor).voice_id); // random voice for everyone else
         } catch (error) {
-          console.re.warn(`TTS error - problem generating audio ${error.name}`);
+          console.warn(`TTS error - problem generating audio ${error.name}`);
         }
       }
       //*/
@@ -540,14 +540,14 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
    */
   saveEpisode(name, episode, callback=()=>{}) {
     if (episode.directions.length <= 6) { // the base number of directions added (currently: intro, establishing, location, cam, pause, end)
-      console.re.warn(`episode ${name} has no dialog and will be skipped.  Please check connection to KoboldAI API.`);
+      console.warn(`episode ${name} has no dialog and will be skipped.  Please check connection to KoboldAI API.`);
       // TODO should this also stop the queue?
       return;
     }
 
     fs.writeFile(`episodes/${name}.json`, JSON.stringify(episode), "utf-8", (err) => {
-      if (err) console.re.error(err);
-      else console.re.log(`(^.^) NEW EPISODE OF GOOPSEA IS AVAILABLE: ${name}!`);
+      if (err) console.error(err);
+      else console.log(`(^.^) NEW EPISODE OF GOOPSEA IS AVAILABLE: ${name}!`);
       if (callback) callback();
     });
   }

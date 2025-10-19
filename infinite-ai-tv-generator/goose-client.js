@@ -44,17 +44,17 @@ module.exports = class GooseAIClient {
     })
       .then(json)
       .then((data) => {
-        console.re.log(`gooseai:generate> ${JSON.stringify(data)}`);
+        console.log(`gooseai:generate> ${JSON.stringify(data)}`);
         return data.choices[0].text;
         // const response = data.choices[0].text;
         // return response.replace(stopTokenRegex, ""); // remove trailing stop tokens
       })
       .catch((ex) => {
-        console.re.error(`gooseai:generate> error ${ex.name}: ${ex.message}`);
+        console.error(`gooseai:generate> error ${ex.name}: ${ex.message}`);
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
       });
   }

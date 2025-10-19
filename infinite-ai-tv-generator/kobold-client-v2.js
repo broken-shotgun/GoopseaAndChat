@@ -47,17 +47,17 @@ module.exports = class KoboldAIClient {
     })
       .then(json)
       .then((data) => {
-        console.re.log(`KoboldAI/v2:generate> ${JSON.stringify(data)}`);
+        console.log(`KoboldAI/v2:generate> ${JSON.stringify(data)}`);
         if (data)
           return data;
         return {};
       })
       .catch((ex) => {
-        console.re.error(`KoboldAI/v2:generate> error ${ex.name}: ${ex.message}`);
+        console.error(`KoboldAI/v2:generate> error ${ex.name}: ${ex.message}`);
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
         return [];
       });
@@ -82,17 +82,17 @@ module.exports = class KoboldAIClient {
     })
       .then(json)
       .then((data) => {
-        console.re.log(`KoboldAI/v2:getGenerateResults> ${JSON.stringify(data)}`);
+        console.log(`KoboldAI/v2:getGenerateResults> ${JSON.stringify(data)}`);
         if (data && data.generations && data.generations.length > 0)
           return data.generations;
         return [];
       })
       .catch((ex) => {
-        console.re.error(`KoboldAI/v2:getGenerateResults> error ${ex.name}: ${ex.message}`);
+        console.error(`KoboldAI/v2:getGenerateResults> error ${ex.name}: ${ex.message}`);
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
         return [];
       });

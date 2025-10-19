@@ -10,7 +10,7 @@ consolere.connect({
   // disableDefaultConsoleOutput: true, // optional, default: false
 });
 
-console.re.log(`https://console.re/${process.env.CONSOLERE_CHANNEL}`);
+console.log(`https://console.re/${process.env.CONSOLERE_CHANNEL}`);
 
 const OpenAIClient = require("./openai-client");
 const openai = new OpenAIClient();
@@ -22,7 +22,7 @@ const { formatShortPrompt } = require("./prompt");
 
 async function testGenerate(prompt) {
   // const response = await openai.generate(prompt);
-  // console.re.log(response.data.choices[0].text);
+  // console.log(response.data.choices[0].text);
   // const rawTxtStory = prompt + "\n" + response.data.choices[0].text;
   
   // ChatGPT API
@@ -32,20 +32,20 @@ async function testGenerate(prompt) {
   const generateCount = 5;
   for(var i=0; i<generateCount; ++i) {
     const response = await openai.generateChat(messages);
-    console.re.log(`${response.status} ${response.statusText}: ${JSON.stringify(response.data)}`);
+    console.log(`${response.status} ${response.statusText}: ${JSON.stringify(response.data)}`);
 
     if (!response.data || response.data.choices.length < 1) break;
     
-    console.re.log(response.data.choices[0].message.content);
+    console.log(response.data.choices[0].message.content);
     messages.push(response.data.choices[0].message);
   }
 
   const rawTxtStory = messages.map((msg) => msg.content).join("\n");
   const modResponse = await openai.moderate(rawTxtStory);
 
-  console.re.log(modResponse.status);
-  console.re.log(modResponse.statusText);
-  console.re.log(JSON.stringify(modResponse.data));
+  console.log(modResponse.status);
+  console.log(modResponse.statusText);
+  console.log(JSON.stringify(modResponse.data));
 
   if (modResponse.data && modResponse.data.results.length > 0) {
     const modCategories = modResponse.data.results[0].categories;
@@ -57,10 +57,10 @@ async function testGenerate(prompt) {
     ) {
       const timestamp = new Date(Date.now()).toISOString().replaceAll(":", "-");
       const dirtyFilename = `episodes/raw/DITRY-${timestamp}.txt`
-      console.re.warn(`Story failed moderation check, saving to ${dirtyFilename}...`);
+      console.warn(`Story failed moderation check, saving to ${dirtyFilename}...`);
       fs.writeFile(dirtyFilename, rawTxtStory, "utf-8", (err) => {
-        if (err) console.re.error(err);
-        else console.re.warn(`DIRTY STORY OF GOOPSEA READY FOR REVIEW!`);
+        if (err) console.error(err);
+        else console.warn(`DIRTY STORY OF GOOPSEA READY FOR REVIEW!`);
 
         process.exit();
       });
@@ -68,8 +68,8 @@ async function testGenerate(prompt) {
     }
 
     fs.writeFile(`episodes/raw/story.txt`, rawTxtStory, "utf-8", (err) => {
-      if (err) console.re.error(err);
-      else console.re.log(`RAW TXT STORY OF GOOPSEA READY TO BE PROCESSED!`);
+      if (err) console.error(err);
+      else console.log(`RAW TXT STORY OF GOOPSEA READY TO BE PROCESSED!`);
 
       process.exit();
     });
@@ -97,12 +97,12 @@ async function testProcess(story) {
 
 async function testImageGen(prompt) {
   const imgResponse = await openai.generateImage(prompt);
-  console.re.log(`${imgResponse.status} ${imgResponse.statusText}`);
+  console.log(`${imgResponse.status} ${imgResponse.statusText}`);
   
   const imgB64 = imgResponse.data.data[0].b64_json;
   await fs.writeFile("public/test-image.base64.txt", imgB64, "utf-8", (err) => {
     if (err)
-      console.re.error(err);
+      console.error(err);
   });
 }
 
@@ -116,7 +116,7 @@ Goopsea:
 Jack: 
 */
 
-// console.re.log(formatShortPrompt(process.argv[2]));
+// console.log(formatShortPrompt(process.argv[2]));
 // process.exit();
 
 // Goopsea: JACK! I NEED LASAGNA! I am so hungry, I could eat a whole house!
@@ -130,7 +130,7 @@ Jack:
 
 // read raw story tmp file
 // fs.readFile("episodes/raw/story.txt", "utf-8", (err, data) => {
-//   if (err) console.re.error(err);
+//   if (err) console.error(err);
 //   else {
 //     testProcess(data);
 //   }

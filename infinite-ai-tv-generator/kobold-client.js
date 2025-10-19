@@ -30,14 +30,14 @@ module.exports = class KoboldAIClient {
       },
     })
       .then((res) => {
-        console.re.log(`KoboldAI:loadStory> story loaded successfully!`);
+        console.log(`KoboldAI:loadStory> story loaded successfully!`);
       })
       .catch((ex) => {
-        console.re.error(`KoboldAI:loadStory> error ${ex.name}: ${ex.message}`);
+        console.error(`KoboldAI:loadStory> error ${ex.name}: ${ex.message}`);
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
         return [];
       });
@@ -65,17 +65,17 @@ module.exports = class KoboldAIClient {
     })
       .then(json)
       .then((data) => {
-        console.re.log(`KoboldAI:generate> ${JSON.stringify(data)}`);
+        console.log(`KoboldAI:generate> ${JSON.stringify(data)}`);
         if (data && data.results && data.results.length > 0)
           return data.results;
         return [];
       })
       .catch((ex) => {
-        console.re.error(`KoboldAI:generate> error ${ex.name}: ${ex.message}`);
+        console.error(`KoboldAI:generate> error ${ex.name}: ${ex.message}`);
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
         return [];
       });
@@ -96,17 +96,17 @@ module.exports = class KoboldAIClient {
     })
       .then(json)
       .then((data) => {
-        console.re.log(`KoboldAI:getStory> ${JSON.stringify(data)}`);
+        console.log(`KoboldAI:getStory> ${JSON.stringify(data)}`);
         if (data && data.results && data.results.length > 0)
           return data.results;
         return [];
       })
       .catch((ex) => {
-        console.re.error(`KoboldAI:getStory> error ${ex.name}: ${ex.message}`);
+        console.error(`KoboldAI:getStory> error ${ex.name}: ${ex.message}`);
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
         return [];
       });
@@ -121,7 +121,7 @@ module.exports = class KoboldAIClient {
    */
   addStory(prompt) {
     if (!prompt) {
-      console.re.warn("KoboldAI> prompt is missing");
+      console.warn("KoboldAI> prompt is missing");
       return;
     }
 
@@ -138,17 +138,17 @@ module.exports = class KoboldAIClient {
       },
     })
       .then((res) => {
-        console.re.log("KoboldAI> added story end");
+        console.log("KoboldAI> added story end");
         this.saved = false;
       })
       .catch((ex) => {
-        console.re.error(
+        console.error(
           `koboldai add story end error ${ex.name}: ${ex.message}`
         );
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
       });
   }
@@ -169,16 +169,16 @@ module.exports = class KoboldAIClient {
       },
     })
       .then((res) => {
-        console.re.log("KoboldAI> removed story end");
+        console.log("KoboldAI> removed story end");
       })
       .catch((ex) => {
-        console.re.error(
+        console.error(
           `koboldai remove story end error ${ex.name}: ${ex.message}`
         );
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
       });
   }
@@ -202,15 +202,15 @@ module.exports = class KoboldAIClient {
       },
     })
       .then((res) => {
-        console.re.log(`KoboldAI> saved story '${saveName}'`);
+        console.log(`KoboldAI> saved story '${saveName}'`);
         this.saved = true;
       })
       .catch((ex) => {
-        console.re.error(`koboldai save story error ${ex.name}: ${ex.message}`);
+        console.error(`koboldai save story error ${ex.name}: ${ex.message}`);
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
       });
   }
@@ -232,11 +232,11 @@ module.exports = class KoboldAIClient {
         return data.result;
       })
       .catch((ex) => {
-        console.re.error(`koboldai get model error ${ex.name}: ${ex.message}`);
+        console.error(`koboldai get model error ${ex.name}: ${ex.message}`);
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
         return "error fetching model name";
       });
@@ -255,16 +255,16 @@ module.exports = class KoboldAIClient {
       },
     })
       .then((res) => {
-        console.re.log(`KoboldAI> cleared story`);
+        console.log(`KoboldAI> cleared story`);
       })
       .catch((ex) => {
-        console.re.error(
+        console.error(
           `koboldai clear story error ${ex.name}: ${ex.message}`
         );
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
         return "error clearing story";
       });

@@ -50,13 +50,13 @@ module.exports = class GCTTS {
         return res.audioContent;
       })
       .catch((ex) => {
-        console.re.error(
+        console.error(
           `textToSpeech> error ${ex.name}: ${ex.message}`
         );
         if (ex.response) {
-          console.re.error(ex.response.data);
+          console.error(ex.response.data);
         } else {
-          console.re.error(ex.stack);
+          console.error(ex.stack);
         }
         return "";
       });

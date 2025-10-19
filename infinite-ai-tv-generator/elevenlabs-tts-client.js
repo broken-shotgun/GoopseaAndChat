@@ -24,7 +24,7 @@ module.exports = class ElevenLabsTTS {
       text: message,
       ...options,
     };
-    // console.re.log(`elevenlabs:textToSpeech> ${requestUrl} > ${JSON.stringify(postData)}`);
+    // console.log(`elevenlabs:textToSpeech> ${requestUrl} > ${JSON.stringify(postData)}`);
     return fetch(requestUrl, {
       method: "POST",
       body: JSON.stringify(postData),
@@ -33,16 +33,16 @@ module.exports = class ElevenLabsTTS {
         "xi-api-key": process.env.ELEVENLABS_API_SECRET,
       },
     }).then((response) => {
-      // console.re.log("elevenlabs:textToSpeech> response = ", response.status, JSON.stringify(response.body));
+      // console.log("elevenlabs:textToSpeech> response = ", response.status, JSON.stringify(response.body));
       return streamToBase64String(response.body);
     }).catch((ex) => {
-      console.re.error(
+      console.error(
         `elevenlabs:textToSpeech> error ${ex.name}: ${ex.message}`
       );
       if (ex.response) {
-        console.re.error(ex.response.data);
+        console.error(ex.response.data);
       } else {
-        console.re.error(ex.stack);
+        console.error(ex.stack);
       }
       return "";
     });

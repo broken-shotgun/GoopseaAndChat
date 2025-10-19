@@ -15,7 +15,7 @@ consolere.connect({
   // disableDefaultConsoleOutput: true, // optional, default: false
 });
 
-console.re.log(`https://console.re/${process.env.CONSOLERE_CHANNEL}`);
+console.log(`https://console.re/${process.env.CONSOLERE_CHANNEL}`);
 
 const KoboldAIClient = require("./kobold");
 const koboldai = new KoboldAIClient();

@@ -73,7 +73,7 @@ var channel;
  * DISCORD
  */
 // discord.once('ready', () => {
-// 	console.re.log('Ready!');
+// 	console.log('Ready!');
 // });
 
 discord.on('interactionCreate', async interaction => {
@@ -156,8 +156,8 @@ discord.on('interactionCreate', async interaction => {
         await interaction.editReply("Bot response was empty");
       }
     } else {
-      console.re.warn(interaction.commandName);
-      console.re.warn(interaction.options.getSubcommand());
+      console.warn(interaction.commandName);
+      console.warn(interaction.options.getSubcommand());
       await tmpReply(interaction, "Not valid round for that command");
     }
   }
@@ -170,10 +170,10 @@ async function tmpReply(interaction, message, waitTimeInMs=1000) {
 }
 
 async function setupVoice(queue) {
-    if(!discord) return console.re.error("Please connect to client first!");
+    if(!discord) return console.error("Please connect to client first!");
 
     channel = await discord.channels.fetch(voiceChannelId);
-    if (!channel) return console.re.error("The channel does not exist!");
+    if (!channel) return console.error("The channel does not exist!");
   
     // console.log(`joining voice channel> channelName = ${channel.name}, channelId = ${channel.id}, guildId = ${channel.guild.id}`);
 
@@ -183,7 +183,7 @@ async function setupVoice(queue) {
         adapterCreator: channel.guild.voiceAdapterCreator,
     });
     connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
-      console.re.log('Connection is disconnected...');
+      console.log('Connection is disconnected...');
       try {
         await Promise.race([
           entersState(connection, VoiceConnectionStatus.Signalling, 5),
@@ -196,11 +196,11 @@ async function setupVoice(queue) {
       }
     });
     connection.on('stateChange', (oldState, newState) => {
-      console.re.log(`! Discord voice connection: ${oldState.status} -> ${newState.status}`);
+      console.log(`! Discord voice connection: ${oldState.status} -> ${newState.status}`);
     });
     const player = createAudioPlayer();
     player.on('error', error => {
-      console.re.error(error);
+      console.error(error);
     });
     queue._connection = connection;
     queue._player = player;
@@ -304,7 +304,7 @@ app.get("/adventurebot/events", sseExpress(), (request, response) => {
     return;
   }
   
-  console.re.log("AdventureBot> event source client opened");
+  console.log("AdventureBot> event source client opened");
 
   const intervalId = setInterval(() => {
     const eventData = {
@@ -326,7 +326,7 @@ app.get("/adventurebot/events", sseExpress(), (request, response) => {
   }, 200);
   
   response.on('close', () => {
-    console.re.log("AdventureBot> event source client closed");
+    console.log("AdventureBot> event source client closed");
     clearInterval(intervalId);
   });
 });
@@ -335,11 +335,11 @@ app.get("/adventurebot/events", sseExpress(), (request, response) => {
  * Starts everything need to run Hular Hoops Bot!
  */
 function start() {
-  console.re.log("Starting hular hoops bot...");
+  console.log("Starting hular hoops bot...");
   discord.login();
   twitch.connect();
   const listener = app.listen(process.env.PORT, () => {
-    console.re.log("Your app is listening on port " + listener.address().port);
+    console.log("Your app is listening on port " + listener.address().port);
   });
 }
 
