@@ -32,12 +32,16 @@ $(document).ready(function () {
     const shouldSkipTTS = $("#skiptts").is(":checked");
     const location = $("#location").val();
     const model = $("#model").val();
+    const generateCount = $("#generatecount").val();
+    const generateTokenAmount = $("#generatetokenamount").val();
     const userPrompt = {
       user: $("#author").val(),
       prompt: "",
       location: location,
       model: model,
       skiptts: shouldSkipTTS,
+      generatecount: generateCount,
+      generatetokenamount: generateTokenAmount,
     };
     userPrompt.prompt = $("#message").val();
     console.log(JSON.stringify(userPrompt));

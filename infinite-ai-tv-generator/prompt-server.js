@@ -121,6 +121,8 @@ app.post("/addPromptManual", (req, res) => {
   const location = req.body.location;
   const model = req.body.model;
   const skiptts = req.body.skiptts;
+  const generatecount = req.body.generatecount;
+  const generatetokenamount = req.body.generatetokenamount;
 
   const userPrompt = {
     user,
@@ -130,6 +132,8 @@ app.post("/addPromptManual", (req, res) => {
     model,
     options: {
       skiptts,
+      generateCount: generatecount,
+      generateTokenAmount: generatetokenamount,
     }
   };
 

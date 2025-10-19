@@ -83,6 +83,8 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
   /**
    * @typedef {Object} UserPromptOptions
    * @property {boolean} skiptts Skips generating TTS audio for this prompt. (For testing)
+   * @property {number} generateCount how many times should AI attempt to generate response before next prompt
+   * @property {number} generateTokenAmount the max tokens per generate
    */
 
   /**
@@ -186,18 +188,18 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         // messages.push(currentUserPrompt.prompt);
       }
 
-      var generateCount = 1; // TODO add this as a parameter to submit prompt form
-      var modifierIndex = getRandomInt(this.modifiers.length);
+      const generateCount = currentUserPrompt.options.generateCount ?? 1;
+      const modifierIndex = getRandomInt(this.modifiers.length);
       while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
       this.prevModifierIndex = modifierIndex;
       //var prevRemainingTokens = 0;
-      for(var i=0; i<generateCount; ++i) {
+      for(let i=0; i<generateCount; ++i) {
         const isEndOfEpisode = i > 0 && i == generateCount-1;
         if (isEndOfEpisode) {
           messages.push({role: "user", content: "Wrap up the episode in a satisfying way." });
         }
         else if (i > 0) {
-          var midPrompt = this.modifiers[modifierIndex];
+          const midPrompt = this.modifiers[modifierIndex];
           console.log(`generator:modify> ${midPrompt.toUpperCase()}`);
           // openai
           messages.push({role: "system", content: midPrompt });
@@ -207,7 +209,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         }
 
         // openai
-        const maxTokens = isEndOfEpisode ? 1000 : 500; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
+        const maxTokens = currentUserPrompt.options.generateTokenAmount ?? 500; //isEndOfEpisode ? 1000 : 500; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
 
         // gooseai
         // const maxTokens = 500; // gooseai
