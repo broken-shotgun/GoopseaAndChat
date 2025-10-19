@@ -55,13 +55,9 @@ $(document).ready(function () {
       contentType: "application/json",
       success: function (data) {
         console.log(data);
-        $(":input", "#enquiry")
-          .not(":button, :submit, :reset, :hidden")
-          .val("")
-          .prop("checked", false)
-          .prop("selected", false);
         counter.html(counterValue);
         $("#author").val("aipd");
+        $("#message").val("");
         $("form#enquiry input[type=submit]").hide();
       },
       data: JSON.stringify(userPrompt),

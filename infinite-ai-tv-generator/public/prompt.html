@@ -12,8 +12,8 @@
   <form id="enquiry" action="">
     <input type="text" id="author" name="author" placeholder="Author" value="aipd">
     <select name="model" id="model">
-      <option value="gpt-oss:20b">gpt-oss:20b</option>
-      <option value="deepseek-r1:8b">deepseek-r1:8b</option>
+      <!-- <option value="gpt-oss:20b">gpt-oss:20b</option>
+      <option value="deepseek-r1:8b">deepseek-r1:8b</option> -->
       <option value="llama3.1:8b" selected>llama3.1:8b</option>
     </select>
     <textarea maxlength="5000" name="message" id="message" placeholder="Add your prompt!"></textarea>
@@ -24,10 +24,13 @@
       <option value="litter-box">Litter Box</option>
       <option value="transmission-factory">Factory</option>
     </select>
-    <input type="number" id="generatecount" name="generatecount" value="1">
-    <input type="number" id="generatetokenamount" name="generatetokenamount" value="500">
     <input type="checkbox" id="continue" name="continue">
     <label for="continue">Continue?</label>
+    <br>
+    <label for="generatecount">Generate Count</label>
+    <input type="number" id="generatecount" name="generatecount" value="1"><br>
+    <label for="generatetokenamount">Max Tokens</label>
+    <input type="number" id="generatetokenamount" name="generatetokenamount" value="500">
     <!-- <input type="checkbox" id="skiptts" name="skiptts"> -->
     <!-- <label for="skiptts">Skip generating TTS audio?</label><br> -->
     <input type="submit" value="Submit Prompt">

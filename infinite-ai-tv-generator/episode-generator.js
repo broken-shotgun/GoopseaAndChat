@@ -46,37 +46,37 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
     // https://en.wikipedia.org/wiki/The_Thirty-Six_Dramatic_Situations
     this.modifiers = shuffle([
       // "Continue the script and focus on the initial topic.",
-      "Continue the script and make the characters experience or achieve something amazing.",
+      "Continue and make the characters experience or achieve something amazing.",
       // "Continue the script and make the characters experience a downfall and have an unhappy ending.",
       // "Continue the script and have one of the characters fail.",
       // "Continue the script make it a comedy.",
-      "Continue the script and make it a tragedy.",
-      "Continue the script and make it have a sad ending.",
-      // "Continue the script and make it have a happy ending.",
-      // "Continue the script and introduce a celebrirty or famous character from a work of fiction.",
-      // "Continue the script and make all the characters breakout into a WWE style wrestling match.",
-      "Continue the script and give one of the characters a supernatural power.",
-      "Continue the script and introduce an apocalyptic event.",
-      "Continue the script and make it into a heroes story.",
-      "Continue the script and make one of the characters gain something new",
-      "Continue the script and introduce a conflict.",
-      "Continue the script and make one of the characters master a new thing.",
-      "Continue the script and make one of the characters fall victim to madness.",
-      "Continue the script and make one of the characters get revenge",
-      "Continue the script and introduce a sudden disaster.",
-      "Continue the script and make one of the characters start a new enterprise based off the script so far.",
-      "Continue the script and make one of the characters self-sacrifice for an ideal.",
-      "Continue the script and make one of the characters self-sacrifice for kin.",
-      "Continue the script and make one of the characters self-sacrifice for passion.",
-      "Continue the script and make one of the characters face off against a rival.",
-      "Continue the script and make one of the characters have a conflict with a god.",
-      "Continue the script and make one of the characters deal with remorse.",
-      // "Continue the script and make one of the characters overcome a monster.",
-      "Continue the script and make one of the characters go on a quest.",
-      "Continue the script and make one of the characters change their ways and become a better individual.",
-      "Continue the script and make one of the characters go on a voyage.",
-      "Continue the script and have the characters experience a natural disaster.",
-      "Continue the script and have the characters experience an unnatural disaster."
+      "Continue and make it a tragedy.",
+      "Continue and make it sad.",
+      "Continue and make it happy.",
+      "Continue and introduce a celebrirty or famous character.",
+      // "Continue and make all the characters breakout into a WWE style wrestling match.",
+      "Continue and give one of the characters a supernatural power.",
+      "Continue and introduce an apocalyptic event.",
+      "Continue and make it into a heroes story.",
+      "Continue and make one of the characters gain something new.",
+      "Continue and introduce a conflict.",
+      "Continue and make one of the characters master a new thing.",
+      "Continue and make one of the characters fall victim to madness.",
+      "Continue and make one of the characters get revenge",
+      "Continue and introduce a sudden disaster.",
+      "Continue and make one of the characters start a new enterprise.",
+      "Continue and make one of the characters self-sacrifice for an ideal.",
+      "Continue and make one of the characters self-sacrifice for kin.",
+      "Continue and make one of the characters self-sacrifice for passion.",
+      "Continue and make one of the characters face off against a rival.",
+      "Continue and make one of the characters have a conflict with a god.",
+      "Continue and make one of the characters deal with remorse.",
+      // "Continue and make one of the characters overcome a monster.",
+      "Continue and make one of the characters go on a quest.",
+      "Continue and make one of the characters change their ways and become a better individual.",
+      "Continue and make one of the characters go on a voyage.",
+      "Continue and have the characters experience a natural disaster.",
+      "Continue and have the characters experience an unnatural disaster."
     ]);
   }
 
@@ -188,7 +188,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         // messages.push(currentUserPrompt.prompt);
       }
 
-      const generateCount = currentUserPrompt.options.generateCount ?? 1;
+      const generateCount = currentUserPrompt.options.generateCount ? Number(currentUserPrompt.options.generateCount) : 1;
       const modifierIndex = getRandomInt(this.modifiers.length);
       while (modifierIndex == this.prevModifierIndex) modifierIndex = getRandomInt(this.modifiers.length); // guarentee new modifier
       this.prevModifierIndex = modifierIndex;
@@ -196,7 +196,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
       for(let i=0; i<generateCount; ++i) {
         const isEndOfEpisode = i > 0 && i == generateCount-1;
         if (isEndOfEpisode) {
-          messages.push({role: "user", content: "Wrap up the episode in a satisfying way." });
+          messages.push({role: "user", content: "Wrap up the episode in a satisfying way or with a cliffhanger ending that makes the viewer want to watch the next episode." });
         }
         else if (i > 0) {
           const midPrompt = this.modifiers[modifierIndex];
@@ -209,7 +209,7 @@ CHARACTER ${this.chatLogDivider} LINE OF DIALOG
         }
 
         // openai
-        const maxTokens = currentUserPrompt.options.generateTokenAmount ?? 500; //isEndOfEpisode ? 1000 : 500; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
+        const maxTokens = currentUserPrompt.options.generateTokenAmount ? Number(currentUserPrompt.options.generateTokenAmount) : 500; //isEndOfEpisode ? 1000 : 500; //this.getMaxTokens(i, generateCount); // + prevRemainingTokens;
 
         // gooseai
         // const maxTokens = 500; // gooseai

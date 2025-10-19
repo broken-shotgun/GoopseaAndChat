@@ -159,7 +159,7 @@ app.post("/continue", (req, res) => {
   const user = req.body.user;
   const prompt = req.body.prompt;
   const location = req.body.location;
-    const model = req.body.model;
+  const model = req.body.model;
   const skiptts = req.body.skiptts;
 
   generator.markContinue();
