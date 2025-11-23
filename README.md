@@ -1,5 +1,7 @@
 # Goopsea & Chat
 
+<img width="960" height="540" alt="fan_art_by_bulk_bogan" src="https://github.com/user-attachments/assets/7fd09307-2ce9-4c11-ae03-573b3a12ac21" />
+
 ## infinite-ai-tv-generator-player (Unity)
 
 This is the Unity project for the episode player.  This looks at a directory and plays generated episodes.  (Defaults to `ai-tv_Data\episodes\`, can be overriden by using debug console `~` and calling `setEpisodesDir` command)
